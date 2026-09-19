@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { stripLocale } from "@/lib/i18n";
 import { Avatar } from "./Avatar";
+import { useLocale } from "./LocaleProvider";
 
 export function UserMenu() {
   const { data: session, isPending } = authClient.useSession();
@@ -12,6 +14,7 @@ export function UserMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const { t, href } = useLocale();
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -26,10 +29,10 @@ export function UserMenu() {
   if (!session) {
     return (
       <Link
-        href={`/login?next=${encodeURIComponent(pathname)}`}
-        className="rounded-full bg-gradient-to-r from-saffron to-maroon px-4 py-2 text-sm font-semibold text-white shadow-md shadow-saffron/25 transition hover:brightness-110"
+        href={`${href("/login")}?next=${encodeURIComponent(href(stripLocale(pathname).path))}`}
+        className="whitespace-nowrap rounded-full bg-gradient-to-r from-saffron to-maroon px-4 py-2 text-sm font-semibold text-white shadow-md shadow-saffron/25 transition hover:brightness-110"
       >
-        लॉगिन
+        {t.nav.login}
       </Link>
     );
   }
@@ -41,7 +44,7 @@ export function UserMenu() {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        aria-label="User menu"
+        aria-label={t.nav.userMenu}
         className="block rounded-full ring-2 ring-transparent transition hover:ring-saffron"
       >
         <Avatar name={user.name} image={user.image} size={40} />
@@ -55,11 +58,11 @@ export function UserMenu() {
           <nav className="p-1.5 text-sm" onClick={() => setOpen(false)}>
             {user.isAdmin && (
               <>
-                <Link href="/admin" className="block rounded-lg px-3 py-2 hover:bg-surface-2">
-                  📋 Admin Dashboard
+                <Link href={href("/admin")} className="block rounded-lg px-3 py-2 hover:bg-surface-2">
+                  📋 {t.nav.admin}
                 </Link>
-                <Link href="/admin/new" className="block rounded-lg px-3 py-2 hover:bg-surface-2">
-                  ✍️ नया लेख लिखें
+                <Link href={href("/admin/new")} className="block rounded-lg px-3 py-2 hover:bg-surface-2">
+                  ✍️ {t.nav.newPost}
                 </Link>
               </>
             )}
@@ -71,7 +74,7 @@ export function UserMenu() {
               }}
               className="block w-full rounded-lg px-3 py-2 text-left text-red-600 hover:bg-surface-2"
             >
-              लॉगआउट
+              {t.nav.logout}
             </button>
           </nav>
         </div>

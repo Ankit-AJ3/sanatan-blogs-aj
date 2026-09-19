@@ -1,11 +1,15 @@
 import Link from "next/link";
-import { JsonLd } from "./JsonLd";
+import { localePath } from "@/lib/i18n";
+import { getT } from "@/lib/locale";
 import { absoluteUrl } from "@/lib/site";
+import { JsonLd } from "./JsonLd";
 
+/** `href` is locale-less; it is localized here. */
 export type Crumb = { name: string; href: string };
 
-export function Breadcrumbs({ items }: { items: Crumb[] }) {
-  const all = [{ name: "होम", href: "/" }, ...items];
+export async function Breadcrumbs({ items }: { items: Crumb[] }) {
+  const { lang, t } = await getT();
+  const all = [{ name: t.breadcrumbHome, href: "/" }, ...items].map((c) => ({ ...c, href: localePath(lang, c.href) }));
   return (
     <>
       <nav aria-label="Breadcrumb" className="text-sm text-muted">

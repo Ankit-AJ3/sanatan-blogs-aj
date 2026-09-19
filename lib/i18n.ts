@@ -1,0 +1,451 @@
+// Shared (server + client) i18n: locales, URL helpers and UI dictionaries.
+// Hindi is the default language and lives at un-prefixed URLs (/blog/...);
+// English lives under /en (/en/blog/...).
+
+export const locales = ["hi", "en"] as const;
+export type Locale = (typeof locales)[number];
+export const defaultLocale: Locale = "hi";
+export const LOCALE_COOKIE = "lang";
+
+export const isLocale = (v: unknown): v is Locale => typeof v === "string" && (locales as readonly string[]).includes(v);
+
+export const htmlLang: Record<Locale, string> = { hi: "hi", en: "en" };
+export const bcp47: Record<Locale, string> = { hi: "hi-IN", en: "en-IN" };
+export const ogLocale: Record<Locale, string> = { hi: "hi_IN", en: "en_IN" };
+
+/** Path as the user sees it for a given locale. `path` is locale-less, e.g. "/blog/x". */
+export function localePath(lang: Locale, path = "/") {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  if (lang === defaultLocale) return p;
+  return p === "/" ? `/${lang}` : `/${lang}${p}`;
+}
+
+/** Removes a leading locale prefix from a browser pathname. */
+export function stripLocale(pathname: string): { lang: Locale; path: string } {
+  const m = /^\/(hi|en)(?=\/|$)/.exec(pathname);
+  if (!m) return { lang: defaultLocale, path: pathname || "/" };
+  return { lang: m[1] as Locale, path: pathname.slice(m[0].length) || "/" };
+}
+
+const hi = {
+  nav: {
+    home: "होम",
+    blog: "सभी लेख",
+    categories: "श्रेणियाँ",
+    about: "हमारे बारे में",
+    search: "लेख खोजें",
+    login: "लॉगिन",
+    admin: "Admin Dashboard",
+    newPost: "नया लेख लिखें",
+    logout: "लॉगआउट",
+    menu: "मेनू",
+    userMenu: "यूज़र मेनू",
+    theme: "डार्क मोड बदलें",
+    skip: "मुख्य सामग्री पर जाएँ",
+    switchLabel: "Read in English",
+    switchShort: "EN",
+  },
+  hero: {
+    mantra: "॥ ॐ नमो भगवते वासुदेवाय ॥",
+    titleA: "सनातन धर्म की",
+    titleB: "ज्ञान-गंगा",
+    subtitle: "वेद, उपनिषद, गीता, पुराण, त्योहार और तीर्थ — प्राचीन भारतीय ज्ञान को सरल भाषा में, आज के जीवन के लिए।",
+    searchPlaceholder: "गीता, दीपावली, योग… खोजें",
+    searchButton: "खोजें",
+  },
+  home: {
+    featured: "विशेष लेख",
+    readMore: "पूरा पढ़ें",
+    categoriesTitle: "श्रेणियाँ",
+    categoriesSub: "अपनी रुचि के विषय चुनें",
+    viewAll: "सभी देखें →",
+    latestTitle: "नवीनतम लेख",
+    latestSub: "हाल ही में प्रकाशित",
+    popular: "🔥 लोकप्रिय लेख",
+    joinTitle: "चर्चा में शामिल हों",
+    joinText: "Google से लॉगिन करें, लेख पसंद करें और अपने विचार साझा करें।",
+    joinButton: "अभी जुड़ें",
+    quoteSource: "— श्रीमद्भगवद्गीता 4.7",
+    quoteMeaning: "",
+  },
+  post: {
+    minRead: (n: number) => `${n} मिनट पढ़ें`,
+    minShort: (n: number) => `${n} मिनट`,
+    articles: (n: number) => `${n} लेख`,
+    empty: "अभी यहाँ कोई लेख नहीं है। जल्द ही नए लेख आएँगे!",
+    toc: "विषय-सूची",
+    tags: "टैग",
+    related: "संबंधित लेख",
+    like: "पसंद करें",
+    liked: "पसंद किया",
+    likeAria: "लेख पसंद करें",
+    unlikeAria: "पसंद हटाएँ",
+    share: "साझा करें:",
+    shareOn: (name: string) => `${name} पर साझा करें`,
+    copyLink: "🔗 लिंक",
+    copied: "✓ कॉपी हो गया",
+    onlyInOther: "यह लेख अभी केवल English में उपलब्ध है।",
+    readInOther: "यह लेख English में भी पढ़ें →",
+  },
+  comments: {
+    title: "💬 टिप्पणियाँ",
+    loginPrompt: "अपने विचार साझा करने के लिए Google से लॉगिन करें 🙏",
+    placeholder: "अपने विचार लिखें…",
+    label: "आपकी टिप्पणी",
+    submit: "टिप्पणी करें",
+    sending: "भेजा जा रहा है…",
+    delete: "हटाएँ",
+    deleting: "हटाया जा रहा…",
+    confirmDelete: "क्या आप यह टिप्पणी हटाना चाहते हैं?",
+    first: "पहली टिप्पणी आप करें! ✨",
+    errors: {
+      login: "टिप्पणी करने के लिए कृपया Google से लॉगिन करें।",
+      short: "टिप्पणी बहुत छोटी है।",
+      long: "टिप्पणी 2000 अक्षरों से कम होनी चाहिए।",
+      notFound: "लेख नहीं मिला।",
+    },
+  },
+  blog: {
+    title: "सभी लेख",
+    metaTitle: "सभी लेख — सनातन धर्म पर लेख",
+    metaPage: (n: number) => `सभी लेख — पृष्ठ ${n}`,
+    description: "सनातन ज्ञान के विभिन्न विषयों पर हमारे सभी लेख।",
+    metaDescription: "सनातन धर्म, भगवद् गीता, वेद-उपनिषद, पुराण, त्योहार, मंदिर और योग पर सभी लेख पढ़ें।",
+    searchPlaceholder: "शीर्षक या टैग से खोजें…",
+    results: (n: number) => `के लिए ${n} परिणाम`,
+    prev: "← पिछला",
+    next: "अगला →",
+  },
+  category: {
+    title: "श्रेणियाँ",
+    metaTitle: "श्रेणियाँ — विषय के अनुसार लेख",
+    description: "विषय के अनुसार सनातन ज्ञान का अन्वेषण करें।",
+    metaDescription:
+      "भगवद् गीता, वेद-उपनिषद, रामायण-महाभारत, पुराण, त्योहार, मंदिर-तीर्थ, योग-ध्यान और संस्कृति — विषय के अनुसार लेख पढ़ें।",
+    notFound: "श्रेणी नहीं मिली",
+    metaSuffix: "पर सभी लेख पढ़ें।",
+  },
+  login: {
+    metaTitle: "लॉगिन",
+    metaDescription: "Google से लॉगिन करें और लेखों को पसंद करें व टिप्पणी करें।",
+    welcome: "स्वागत है 🙏",
+    text: "सनातन ब्लॉग्स परिवार से जुड़ें — लेख पसंद करें, टिप्पणी करें और चर्चा में भाग लें।",
+    button: "Google से जारी रखें",
+    signIn: "Google से लॉगिन करें",
+    error: "लॉगिन नहीं हो सका, कृपया पुनः प्रयास करें।",
+    points: [
+      "कोई पासवर्ड याद रखने की ज़रूरत नहीं",
+      "हम आपकी जानकारी किसी से साझा नहीं करते",
+      "केवल नाम, ईमेल और प्रोफ़ाइल फ़ोटो का उपयोग",
+    ],
+  },
+  about: {
+    metaTitle: "हमारे बारे में",
+    title: "हमारे बारे में",
+    subtitle: "सनातन ज्ञान, सरल भाषा में, सबके लिए।",
+  },
+  notFound: {
+    title: "पृष्ठ नहीं मिला",
+    text: "आप जो खोज रहे हैं वह यहाँ नहीं है — पर ज्ञान की खोज कभी व्यर्थ नहीं जाती। 🙏",
+    home: "होम पर जाएँ",
+    blog: "सभी लेख",
+    code: "४०४",
+    postTitle: "लेख नहीं मिला",
+  },
+  footer: {
+    categories: "श्रेणियाँ",
+    links: "लिंक",
+    motto: "॥ सर्वे भवन्तु सुखिनः ॥",
+    copyright: "सनातन ज्ञान, सबके लिए 🙏",
+  },
+  breadcrumbHome: "होम",
+  admin: {
+    denied: "प्रवेश वर्जित",
+    deniedText: "यह पृष्ठ केवल Admin के लिए है। Admin बनने के लिए अपना ईमेल ADMIN_EMAILS में जोड़ें।",
+    backHome: "← होम पर लौटें",
+    dashboard: "Admin Dashboard",
+    manage: "अपने लेख प्रबंधित करें",
+    newPost: "✍️ नया लेख",
+    newPostTitle: "✍️ नया लेख लिखें",
+    editTitle: "लेख संपादित करें",
+    back: "← Dashboard",
+    stats: { posts: "लेख", likes: "Likes", comments: "टिप्पणियाँ", users: "Users" },
+    cols: { title: "शीर्षक", category: "श्रेणी", status: "स्थिति", languages: "भाषाएँ", updated: "अपडेट" },
+    published: "प्रकाशित",
+    draft: "ड्राफ़्ट",
+    view: "देखें",
+    edit: "संपादित करें",
+    delete: "हटाएँ",
+    confirmDeletePost: "क्या आप यह लेख स्थायी रूप से हटाना चाहते हैं? इसकी सभी likes और टिप्पणियाँ भी हट जाएँगी।",
+    noPosts: "अभी कोई लेख नहीं है।",
+  },
+  editor: {
+    hindiTab: "हिन्दी",
+    englishTab: "English",
+    englishOptional: "English अनुवाद (वैकल्पिक) — भरने पर लेख /en पर English में भी दिखेगा।",
+    title: "शीर्षक (Title) *",
+    titleEn: "Title (English)",
+    titlePlaceholder: "जैसे: भगवद् गीता का कर्मयोग",
+    titleHint: (n: number) => `${n}/65 — SEO के लिए 50–65 अक्षर आदर्श हैं`,
+    excerpt: "सारांश / Meta Description *",
+    excerptEn: "Excerpt / Meta Description (English)",
+    excerptPlaceholder: "लेख का छोटा सारांश — यह Google search results में दिखेगा",
+    excerptHint: (n: number) => `${n}/160 — 120–160 अक्षर आदर्श हैं`,
+    content: "लेख (Markdown) *",
+    contentEn: "Article (Markdown, English)",
+    write: "✏️ लिखें",
+    preview: "👁 पूर्वावलोकन",
+    previewEmpty: "पूर्वावलोकन के लिए कुछ लिखें…",
+    words: (n: number) => `${n} शब्द · ## से Heading, **bold**, > से श्लोक/उद्धरण`,
+    publish: "प्रकाशित करें",
+    featured: "⭐ विशेष लेख (Home पर)",
+    saving: "सहेजा जा रहा है…",
+    save: "🚀 सहेजें",
+    update: "💾 अपडेट करें",
+    category: "श्रेणी *",
+    choose: "चुनें…",
+    slug: "URL Slug",
+    slugHint: "SEO के लिए English slug बेहतर है, जैसे: diwali-ka-mahatva",
+    tags: "Tags / Keywords",
+    tagsHint: "कॉमा (,) से अलग करें",
+    cover: "Cover Image URL",
+    coverHint: "खाली छोड़ने पर श्रेणी के अनुसार सुंदर cover अपने-आप बनेगा",
+    googlePreview: "🔍 Google Preview",
+    errors: {
+      unauthorized: "सिर्फ़ Admin लेख प्रकाशित कर सकते हैं।",
+      title: "शीर्षक (Title) कम से कम 3 अक्षरों का होना चाहिए।",
+      excerpt: "सारांश (Excerpt) कम से कम 20 अक्षरों का होना चाहिए — यह Google में दिखता है।",
+      content: "लेख की सामग्री बहुत छोटी है।",
+      category: "कृपया एक श्रेणी चुनें।",
+      cover: "Cover image एक मान्य URL होना चाहिए।",
+      slug: "यह slug पहले से उपयोग में है। कृपया दूसरा slug दें।",
+      english: "English अनुवाद अधूरा है — Title, Excerpt और Article तीनों भरें या तीनों खाली छोड़ें।",
+      notFound: "लेख नहीं मिला।",
+    },
+  },
+};
+
+export type Dictionary = typeof hi;
+
+const en: Dictionary = {
+  nav: {
+    home: "Home",
+    blog: "All Articles",
+    categories: "Categories",
+    about: "About",
+    search: "Search articles",
+    login: "Login",
+    admin: "Admin Dashboard",
+    newPost: "Write new article",
+    logout: "Log out",
+    menu: "Menu",
+    userMenu: "User menu",
+    theme: "Toggle dark mode",
+    skip: "Skip to main content",
+    switchLabel: "हिन्दी में पढ़ें",
+    switchShort: "हि",
+  },
+  hero: {
+    mantra: "॥ ॐ नमो भगवते वासुदेवाय ॥",
+    titleA: "The Timeless Wisdom of",
+    titleB: "Sanatan Dharma",
+    subtitle:
+      "Vedas, Upanishads, the Gita, Puranas, festivals and pilgrimages — ancient Indian wisdom in simple words, for modern life.",
+    searchPlaceholder: "Search Gita, Diwali, Yoga…",
+    searchButton: "Search",
+  },
+  home: {
+    featured: "Featured",
+    readMore: "Read more",
+    categoriesTitle: "Categories",
+    categoriesSub: "Explore topics that interest you",
+    viewAll: "View all →",
+    latestTitle: "Latest Articles",
+    latestSub: "Recently published",
+    popular: "🔥 Popular Articles",
+    joinTitle: "Join the conversation",
+    joinText: "Sign in with Google to like articles and share your thoughts.",
+    joinButton: "Join now",
+    quoteSource: "— Bhagavad Gita 4.7",
+    quoteMeaning:
+      "Whenever righteousness declines and unrighteousness rises, O Bharata, I manifest Myself.",
+  },
+  post: {
+    minRead: (n: number) => `${n} min read`,
+    minShort: (n: number) => `${n} min`,
+    articles: (n: number) => `${n} ${n === 1 ? "article" : "articles"}`,
+    empty: "No articles here yet. New articles are coming soon!",
+    toc: "Contents",
+    tags: "Tags",
+    related: "Related Articles",
+    like: "Like",
+    liked: "Liked",
+    likeAria: "Like this article",
+    unlikeAria: "Remove like",
+    share: "Share:",
+    shareOn: (name: string) => `Share on ${name}`,
+    copyLink: "🔗 Link",
+    copied: "✓ Copied",
+    onlyInOther: "This article is currently available in Hindi only.",
+    readInOther: "Read this article in Hindi →",
+  },
+  comments: {
+    title: "💬 Comments",
+    loginPrompt: "Sign in with Google to share your thoughts 🙏",
+    placeholder: "Write your thoughts…",
+    label: "Your comment",
+    submit: "Post comment",
+    sending: "Posting…",
+    delete: "Delete",
+    deleting: "Deleting…",
+    confirmDelete: "Do you want to delete this comment?",
+    first: "Be the first to comment! ✨",
+    errors: {
+      login: "Please sign in with Google to comment.",
+      short: "The comment is too short.",
+      long: "Comments must be under 2000 characters.",
+      notFound: "Article not found.",
+    },
+  },
+  blog: {
+    title: "All Articles",
+    metaTitle: "All Articles — Sanatan Dharma, Gita, Vedas & Festivals",
+    metaPage: (n: number) => `All Articles — Page ${n}`,
+    description: "All our articles on the many facets of Sanatan wisdom.",
+    metaDescription:
+      "Read articles on Sanatan Dharma, the Bhagavad Gita, Vedas and Upanishads, Puranas, Hindu festivals, temples and yoga.",
+    searchPlaceholder: "Search by title or tag…",
+    results: (n: number) => `— ${n} ${n === 1 ? "result" : "results"}`,
+    prev: "← Previous",
+    next: "Next →",
+  },
+  category: {
+    title: "Categories",
+    metaTitle: "Categories — Articles by Topic",
+    description: "Explore Sanatan wisdom by topic.",
+    metaDescription:
+      "Bhagavad Gita, Vedas & Upanishads, Ramayana & Mahabharata, Puranas, festivals, temples, yoga and culture — browse articles by topic.",
+    notFound: "Category not found",
+    metaSuffix: "Read all articles.",
+  },
+  login: {
+    metaTitle: "Login",
+    metaDescription: "Sign in with Google to like and comment on articles.",
+    welcome: "Welcome 🙏",
+    text: "Join the Sanatan Blogs family — like articles, comment and take part in discussions.",
+    button: "Continue with Google",
+    signIn: "Sign in with Google",
+    error: "Could not sign in, please try again.",
+    points: [
+      "No password to remember",
+      "We never share your information",
+      "Only your name, email and profile photo are used",
+    ],
+  },
+  about: {
+    metaTitle: "About Us",
+    title: "About Us",
+    subtitle: "Sanatan wisdom, in simple words, for everyone.",
+  },
+  notFound: {
+    title: "Page not found",
+    text: "What you are looking for isn't here — but the search for knowledge is never in vain. 🙏",
+    home: "Go home",
+    blog: "All articles",
+    code: "404",
+    postTitle: "Article not found",
+  },
+  footer: {
+    categories: "Categories",
+    links: "Links",
+    motto: "॥ सर्वे भवन्तु सुखिनः ॥",
+    copyright: "Sanatan wisdom, for everyone 🙏",
+  },
+  breadcrumbHome: "Home",
+  admin: {
+    denied: "Access denied",
+    deniedText: "This page is for admins only. Add your email to ADMIN_EMAILS to become an admin.",
+    backHome: "← Back to home",
+    dashboard: "Admin Dashboard",
+    manage: "Manage your articles",
+    newPost: "✍️ New article",
+    newPostTitle: "✍️ Write a new article",
+    editTitle: "Edit article",
+    back: "← Dashboard",
+    stats: { posts: "Articles", likes: "Likes", comments: "Comments", users: "Users" },
+    cols: { title: "Title", category: "Category", status: "Status", languages: "Languages", updated: "Updated" },
+    published: "Published",
+    draft: "Draft",
+    view: "View",
+    edit: "Edit",
+    delete: "Delete",
+    confirmDeletePost: "Permanently delete this article? All of its likes and comments will be removed too.",
+    noPosts: "No articles yet.",
+  },
+  editor: {
+    hindiTab: "हिन्दी",
+    englishTab: "English",
+    englishOptional: "English translation (optional) — when filled in, the article is also shown in English under /en.",
+    title: "Title (Hindi) *",
+    titleEn: "Title (English)",
+    titlePlaceholder: "e.g. भगवद् गीता का कर्मयोग",
+    titleHint: (n: number) => `${n}/65 — 50–65 characters is ideal for SEO`,
+    excerpt: "Excerpt / Meta Description (Hindi) *",
+    excerptEn: "Excerpt / Meta Description (English)",
+    excerptPlaceholder: "A short summary — shown in Google search results",
+    excerptHint: (n: number) => `${n}/160 — 120–160 characters is ideal`,
+    content: "Article (Markdown, Hindi) *",
+    contentEn: "Article (Markdown, English)",
+    write: "✏️ Write",
+    preview: "👁 Preview",
+    previewEmpty: "Write something to preview…",
+    words: (n: number) => `${n} words · ## for headings, **bold**, > for shlokas/quotes`,
+    publish: "Publish",
+    featured: "⭐ Featured (on home page)",
+    saving: "Saving…",
+    save: "🚀 Save",
+    update: "💾 Update",
+    category: "Category *",
+    choose: "Choose…",
+    slug: "URL Slug",
+    slugHint: "An English slug is better for SEO, e.g. diwali-significance",
+    tags: "Tags / Keywords",
+    tagsHint: "Separate with commas",
+    cover: "Cover Image URL",
+    coverHint: "Leave empty to auto-generate a cover based on the category",
+    googlePreview: "🔍 Google Preview",
+    errors: {
+      unauthorized: "Only admins can publish articles.",
+      title: "The title must be at least 3 characters.",
+      excerpt: "The excerpt must be at least 20 characters — it is shown on Google.",
+      content: "The article content is too short.",
+      category: "Please choose a category.",
+      cover: "Cover image must be a valid URL.",
+      slug: "This slug is already in use. Please choose another.",
+      english: "The English translation is incomplete — fill in Title, Excerpt and Article, or leave all three empty.",
+      notFound: "Article not found.",
+    },
+  },
+};
+
+export const dictionaries: Record<Locale, Dictionary> = { hi, en };
+export const getDictionary = (lang: Locale) => dictionaries[lang];
+
+export type CommentErrorCode = keyof Dictionary["comments"]["errors"];
+export type EditorErrorCode = keyof Dictionary["editor"]["errors"];
+
+/** Picks the English translation of a post when viewing in English and one exists. */
+export function localizePost<
+  T extends { title: string; excerpt: string; titleEn: string | null; excerptEn: string | null },
+>(post: T, lang: Locale) {
+  const useEn = lang === "en" && !!post.titleEn && !!post.excerptEn;
+  return {
+    title: useEn ? post.titleEn! : post.title,
+    excerpt: useEn ? post.excerptEn! : post.excerpt,
+    /** Language the returned text is actually in */
+    contentLang: (useEn ? "en" : "hi") as Locale,
+  };
+}
+
+export const hasEnglish = (post: { titleEn: string | null; excerptEn: string | null; contentEn?: string | null }) =>
+  !!post.titleEn && !!post.excerptEn && post.contentEn !== null && post.contentEn !== "";

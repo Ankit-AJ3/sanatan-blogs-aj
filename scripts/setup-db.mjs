@@ -3,6 +3,7 @@
 import { createClient } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { seedPosts } from "./seed-posts.mjs";
+import { seedPostsEn } from "./seed-posts-en.mjs";
 
 const url = process.env.DATABASE_URL ?? "file:./data/sanatan.db";
 if (url.startsWith("file:")) mkdirSync("./data", { recursive: true });
@@ -62,6 +63,9 @@ const statements = [
     title TEXT NOT NULL,
     excerpt TEXT NOT NULL,
     content TEXT NOT NULL,
+    title_en TEXT,
+    excerpt_en TEXT,
+    content_en TEXT,
     cover_image TEXT,
     category TEXT NOT NULL,
     tags TEXT NOT NULL DEFAULT '',
@@ -93,6 +97,12 @@ const statements = [
 ];
 
 await db.batch(statements, "write");
+
+// Migrations for databases created before a column existed
+const postColumns = (await db.execute("PRAGMA table_info(posts)")).rows.map((r) => r.name);
+for (const col of ["title_en", "excerpt_en", "content_en"]) {
+  if (!postColumns.includes(col)) await db.execute(`ALTER TABLE posts ADD COLUMN ${col} TEXT`);
+}
 console.log("✔ Tables ready");
 
 if (process.argv.includes("--seed")) {
@@ -112,6 +122,13 @@ if (process.argv.includes("--seed")) {
       ],
     });
     inserted += res.rowsAffected;
+    const en = seedPostsEn[p.slug];
+    if (en) {
+      await db.execute({
+        sql: "UPDATE posts SET title_en = ?, excerpt_en = ?, content_en = ? WHERE slug = ? AND title_en IS NULL",
+        args: [en.title, en.excerpt, en.content.trim(), p.slug],
+      });
+    }
   }
   console.log(`✔ Seeded ${inserted} sample article(s)`);
 }

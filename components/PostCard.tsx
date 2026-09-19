@@ -1,39 +1,47 @@
 import Link from "next/link";
+import { getDictionary, localePath, localizePost, type Locale } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 import type { PostCardData } from "@/lib/posts";
-import { getCategory } from "@/lib/site";
+import { categoryText, getCategory } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 import { CoverArt } from "./CoverArt";
 
-export function PostCard({ post, priority = false }: { post: PostCardData; priority?: boolean }) {
+function PostCardView({ post, lang, priority }: { post: PostCardData; lang: Locale; priority: boolean }) {
+  const t = getDictionary(lang);
   const cat = getCategory(post.category);
+  const { title, excerpt, contentLang } = localizePost(post, lang);
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition duration-300 hover:-translate-y-1 hover:border-saffron/40 hover:shadow-xl hover:shadow-saffron/10">
-      <CoverArt
-        title={post.title}
-        coverImage={post.coverImage}
-        category={post.category}
-        priority={priority}
-        className="aspect-[16/9]"
-      />
+      <CoverArt title={title} coverImage={post.coverImage} category={post.category} priority={priority} className="aspect-[16/9]" />
       <div className="flex flex-1 flex-col p-5">
-        {cat && (
-          <Link
-            href={`/category/${cat.slug}`}
-            className="relative z-10 mb-3 w-fit rounded-full bg-saffron-soft px-3 py-1 text-xs font-semibold text-saffron hover:brightness-95"
-          >
-            {cat.nameHi}
-          </Link>
-        )}
-        <h3 className="font-serif text-xl font-bold leading-snug text-ink line-clamp-2 group-hover:text-saffron">
-          <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
-            {post.title}
+        <div className="mb-3 flex items-center gap-2">
+          {cat && (
+            <Link
+              href={localePath(lang, `/category/${cat.slug}`)}
+              className="relative z-10 w-fit rounded-full bg-saffron-soft px-3 py-1 text-xs font-semibold text-saffron hover:brightness-95"
+            >
+              {categoryText(cat, lang).name}
+            </Link>
+          )}
+          {contentLang !== lang && (
+            <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold text-muted">हिन्दी</span>
+          )}
+        </div>
+        <h3
+          lang={contentLang}
+          className="font-serif text-xl font-bold leading-snug text-ink line-clamp-2 group-hover:text-saffron"
+        >
+          <Link href={localePath(lang, `/blog/${post.slug}`)} className="after:absolute after:inset-0">
+            {title}
           </Link>
         </h3>
-        <p className="mt-2 flex-1 text-muted line-clamp-3">{post.excerpt}</p>
+        <p lang={contentLang} className="mt-2 flex-1 text-muted line-clamp-3">
+          {excerpt}
+        </p>
         <div className="mt-4 flex items-center justify-between border-t border-line pt-4 text-sm text-muted">
           <span>
-            <time dateTime={post.publishedAt?.toISOString()}>{formatDate(post.publishedAt)}</time> ·{" "}
-            {post.readingTime} मिनट
+            <time dateTime={post.publishedAt?.toISOString()}>{formatDate(post.publishedAt, lang)}</time> ·{" "}
+            {t.post.minShort(post.readingTime)}
           </span>
           <span className="flex items-center gap-3">
             <span aria-label={`${post.likeCount} likes`}>🙏 {post.likeCount}</span>
@@ -45,19 +53,24 @@ export function PostCard({ post, priority = false }: { post: PostCardData; prior
   );
 }
 
-export function PostGrid({ posts }: { posts: PostCardData[] }) {
+export async function PostCard({ post, priority = false }: { post: PostCardData; priority?: boolean }) {
+  return <PostCardView post={post} lang={await getLocale()} priority={priority} />;
+}
+
+export async function PostGrid({ posts, columns = 3 }: { posts: PostCardData[]; columns?: 2 | 3 }) {
+  const lang = await getLocale();
   if (!posts.length) {
     return (
       <div className="rounded-3xl border border-dashed border-line p-12 text-center text-muted">
         <p className="text-4xl">🪔</p>
-        <p className="mt-3">अभी यहाँ कोई लेख नहीं है। जल्द ही नए लेख आएँगे!</p>
+        <p className="mt-3">{getDictionary(lang).post.empty}</p>
       </div>
     );
   }
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={`grid gap-6 sm:grid-cols-2 ${columns === 3 ? "lg:grid-cols-3" : ""}`}>
       {posts.map((p, i) => (
-        <PostCard key={p.id} post={p} priority={i < 3} />
+        <PostCardView key={p.id} post={p} lang={lang} priority={i < 3} />
       ))}
     </div>
   );

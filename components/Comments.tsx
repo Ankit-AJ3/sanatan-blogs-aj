@@ -1,3 +1,5 @@
+import { localePath } from "@/lib/i18n";
+import { getT } from "@/lib/locale";
 import { timeAgo } from "@/lib/utils";
 import { Avatar } from "./Avatar";
 import { CommentForm, DeleteCommentButton } from "./CommentForm";
@@ -12,7 +14,7 @@ type Comment = {
   userImage: string | null;
 };
 
-export function Comments({
+export async function Comments({
   postId,
   slug,
   comments,
@@ -23,10 +25,11 @@ export function Comments({
   comments: Comment[];
   viewer: { id: string; name: string; image?: string | null; isAdmin: boolean } | null;
 }) {
+  const { lang, t } = await getT();
   return (
     <section id="comments" aria-labelledby="comments-heading" className="scroll-mt-24">
       <h2 id="comments-heading" className="font-serif text-2xl font-bold">
-        💬 टिप्पणियाँ <span className="text-muted">({comments.length})</span>
+        {t.comments.title} <span className="text-muted">({comments.length})</span>
       </h2>
 
       <div className="mt-6 rounded-3xl border border-line bg-surface p-5">
@@ -37,8 +40,8 @@ export function Comments({
           </div>
         ) : (
           <div className="py-4 text-center">
-            <p className="mb-4 text-muted">अपने विचार साझा करने के लिए Google से लॉगिन करें 🙏</p>
-            <SignInButton callbackURL={`/blog/${slug}#comments`} />
+            <p className="mb-4 text-muted">{t.comments.loginPrompt}</p>
+            <SignInButton callbackURL={`${localePath(lang, `/blog/${slug}`)}#comments`} />
           </div>
         )}
       </div>
@@ -51,17 +54,15 @@ export function Comments({
               <div className="flex flex-wrap items-center gap-x-2">
                 <p className="font-semibold">{c.userName}</p>
                 <time dateTime={c.createdAt.toISOString()} className="text-sm text-muted">
-                  {timeAgo(c.createdAt)}
+                  {timeAgo(c.createdAt, lang)}
                 </time>
-                {viewer && (viewer.id === c.userId || viewer.isAdmin) && (
-                  <DeleteCommentButton commentId={c.id} />
-                )}
+                {viewer && (viewer.id === c.userId || viewer.isAdmin) && <DeleteCommentButton commentId={c.id} />}
               </div>
               <p className="mt-1 whitespace-pre-line break-words">{c.content}</p>
             </div>
           </li>
         ))}
-        {!comments.length && <li className="py-6 text-center text-muted">पहली टिप्पणी आप करें! ✨</li>}
+        {!comments.length && <li className="py-6 text-center text-muted">{t.comments.first}</li>}
       </ul>
     </section>
   );

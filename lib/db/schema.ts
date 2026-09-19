@@ -56,6 +56,10 @@ export const posts = sqliteTable(
     title: text("title").notNull(),
     excerpt: text("excerpt").notNull(),
     content: text("content").notNull(),
+    // Optional English translation
+    titleEn: text("title_en"),
+    excerptEn: text("excerpt_en"),
+    contentEn: text("content_en"),
     coverImage: text("cover_image"),
     category: text("category").notNull(),
     tags: text("tags").notNull().default(""),

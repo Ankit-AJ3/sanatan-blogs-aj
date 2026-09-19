@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { getT } from "@/lib/locale";
 
-export function Pagination({
+export async function Pagination({
   page,
   totalPages,
   basePath,
@@ -8,10 +9,12 @@ export function Pagination({
 }: {
   page: number;
   totalPages: number;
+  /** Already localized path */
   basePath: string;
   query?: string;
 }) {
   if (totalPages <= 1) return null;
+  const { t } = await getT();
   const href = (p: number) => {
     const params = new URLSearchParams();
     if (query) params.set("q", query);
@@ -24,7 +27,7 @@ export function Pagination({
     <nav aria-label="Pagination" className="mt-12 flex flex-wrap items-center justify-center gap-2">
       {page > 1 && (
         <Link href={href(page - 1)} rel="prev" className={`${btn} hover:border-saffron hover:text-saffron`}>
-          ← पिछला
+          {t.blog.prev}
         </Link>
       )}
       {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
@@ -39,7 +42,7 @@ export function Pagination({
       ))}
       {page < totalPages && (
         <Link href={href(page + 1)} rel="next" className={`${btn} hover:border-saffron hover:text-saffron`}>
-          अगला →
+          {t.blog.next}
         </Link>
       )}
     </nav>

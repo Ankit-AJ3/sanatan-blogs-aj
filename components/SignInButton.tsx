@@ -3,16 +3,18 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { GoogleIcon } from "./GoogleIcon";
+import { useLocale } from "./LocaleProvider";
 
 export function SignInButton({
   callbackURL,
-  label = "Google से लॉगिन करें",
+  label,
   className = "",
 }: {
   callbackURL?: string;
   label?: string;
   className?: string;
 }) {
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +26,7 @@ export function SignInButton({
       callbackURL: callbackURL ?? window.location.pathname,
     });
     if (error) {
-      setError(error.message ?? "लॉगिन नहीं हो सका, कृपया पुनः प्रयास करें।");
+      setError(error.message ?? t.login.error);
       setLoading(false);
     }
   }
@@ -42,7 +44,7 @@ export function SignInButton({
         ) : (
           <GoogleIcon />
         )}
-        {label}
+        {label ?? t.login.signIn}
       </button>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>

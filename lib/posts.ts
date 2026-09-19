@@ -1,5 +1,6 @@
 import "server-only";
 import { and, count, desc, eq, like, ne, or, sql } from "drizzle-orm";
+import { cache } from "react";
 import { db, schema } from "@/lib/db";
 
 const { posts, likes, comments, user } = schema;
@@ -10,7 +11,7 @@ export const PAGE_SIZE = 9;
 
 export type PostCardData = Pick<
   typeof posts.$inferSelect,
-  "id" | "slug" | "title" | "excerpt" | "coverImage" | "category" | "authorName" | "readingTime" | "publishedAt"
+  "id" | "slug" | "title" | "excerpt" | "titleEn" | "excerptEn" | "coverImage" | "category" | "authorName" | "readingTime" | "publishedAt"
 > & { likeCount: number; commentCount: number };
 
 const cardColumns = {
@@ -18,6 +19,8 @@ const cardColumns = {
   slug: posts.slug,
   title: posts.title,
   excerpt: posts.excerpt,
+  titleEn: posts.titleEn,
+  excerptEn: posts.excerptEn,
   coverImage: posts.coverImage,
   category: posts.category,
   authorName: posts.authorName,
@@ -39,7 +42,7 @@ export async function getPublishedPosts({
   if (category) filters.push(eq(posts.category, category));
   if (query) {
     const q = `%${query.replace(/[%_]/g, "")}%`;
-    filters.push(or(like(posts.title, q), like(posts.excerpt, q), like(posts.tags, q))!);
+    filters.push(or(like(posts.title, q), like(posts.excerpt, q), like(posts.tags, q), like(posts.titleEn, q), like(posts.excerptEn, q))!);
   }
   const where = and(...filters);
 
@@ -76,14 +79,14 @@ export async function getPopularPosts(limit = 5) {
     .limit(limit);
 }
 
-export async function getPostBySlug(slug: string) {
+export const getPostBySlug = cache(async (slug: string) => {
   const [row] = await db
     .select()
     .from(posts)
     .where(and(eq(posts.slug, slug), published))
     .limit(1);
   return row ?? null;
-}
+});
 
 export async function getRelatedPosts(postId: string, category: string, limit = 3) {
   return db
@@ -135,7 +138,7 @@ export async function getCategoryCounts() {
 
 export async function getAllPublishedForSitemap() {
   return db
-    .select({ slug: posts.slug, updatedAt: posts.updatedAt, category: posts.category })
+    .select({ slug: posts.slug, updatedAt: posts.updatedAt, category: posts.category, titleEn: posts.titleEn })
     .from(posts)
     .where(published)
     .orderBy(desc(posts.publishedAt));

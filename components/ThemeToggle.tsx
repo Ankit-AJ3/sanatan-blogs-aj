@@ -1,6 +1,9 @@
 "use client";
 
+import { useLocale } from "./LocaleProvider";
+
 export function ThemeToggle() {
+  const { t } = useLocale();
   function toggle() {
     const root = document.documentElement;
     const next = root.dataset.theme === "dark" ? "light" : "dark";
@@ -13,7 +16,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label="Toggle dark mode"
+      aria-label={t.nav.theme}
       className="grid size-10 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-ink"
     >
       <svg className="size-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>

@@ -17,16 +17,16 @@ export function readingTime(markdown: string) {
   return Math.max(1, Math.round(words / 200));
 }
 
-export function formatDate(date: Date | number | null | undefined) {
+export function formatDate(date: Date | number | null | undefined, lang: "hi" | "en" = "hi") {
   if (!date) return "";
-  return new Intl.DateTimeFormat("hi-IN", { day: "numeric", month: "long", year: "numeric" }).format(
+  return new Intl.DateTimeFormat(lang === "en" ? "en-IN" : "hi-IN", { day: "numeric", month: "long", year: "numeric" }).format(
     new Date(date),
   );
 }
 
-export function timeAgo(date: Date | number) {
+export function timeAgo(date: Date | number, lang: "hi" | "en" = "hi") {
   const diff = (Date.now() - new Date(date).getTime()) / 1000;
-  const rtf = new Intl.RelativeTimeFormat("hi-IN", { numeric: "auto" });
+  const rtf = new Intl.RelativeTimeFormat(lang === "en" ? "en-IN" : "hi-IN", { numeric: "auto" });
   const steps: [number, Intl.RelativeTimeFormatUnit][] = [
     [60, "second"],
     [60, "minute"],

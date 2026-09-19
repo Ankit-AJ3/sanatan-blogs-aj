@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useLocale } from "./LocaleProvider";
 
 export function MobileNav({ links }: { links: { href: string; label: string }[] }) {
   const [open, setOpen] = useState(false);
+  const { t } = useLocale();
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label="Menu"
+        aria-label={t.nav.menu}
         aria-expanded={open}
         className="grid size-10 place-items-center rounded-full text-ink hover:bg-surface-2"
       >
@@ -25,11 +27,7 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
           onClick={() => setOpen(false)}
         >
           {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="block border-b border-line/60 py-3 text-lg font-medium last:border-0"
-            >
+            <Link key={l.href} href={l.href} className="block border-b border-line/60 py-3 text-lg font-medium last:border-0">
               {l.label}
             </Link>
           ))}
