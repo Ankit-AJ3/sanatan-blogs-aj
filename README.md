@@ -1,11 +1,12 @@
 # सनातन ब्लॉग्स — Sanatan Blogs
 
-A fast, SEO-friendly, **bilingual (Hindi + English)** blog about Sanatan Dharma. It's built with **Next.js 16** (App Router), **Tailwind CSS 4**, **Better Auth** (Google login) and **Drizzle ORM + SQLite/Turso**.
+A fast, SEO-friendly, **bilingual (Hindi + English)** blog about Sanatan Dharma. It's built with **Next.js 16** (App Router), **Tailwind CSS 4**, **Better Auth** (Google login), **MongoDB** and **Cloudinary** (image uploads).
 
 ## Features
 
 - 🌐 **Hindi + English**: Hindi is the default language at `/…`, and English lives at `/en/…`. The **हि | EN** switcher in the header keeps you on the same page. Articles have optional English translations (a Hindi/English tab in the editor). An untranslated article opens in English with a “Hindi only” note, and its canonical URL points to the Hindi original.
 - ✍️ **Admin panel** (`/admin`) where you can write, edit, delete, draft and feature articles in Markdown, with a toolbar, live preview, SEO character counters and a Google-result preview
+- 🖼️ **Image uploads to Cloudinary**: drag & drop a cover photo, or upload a photo straight into the article body. Replacing or deleting a post removes its image from Cloudinary too. Posts without a cover get an auto-generated gradient.
 - 🔐 **Google sign-in**: readers log in with one click
 - 🙏 **Likes** (optimistic UI) and 💬 **comments** (users can delete their own comments; admins can delete any)
 - 🔍 Search, categories, pagination, related posts, table of contents and share buttons (WhatsApp, Facebook, X, Telegram)
@@ -24,7 +25,7 @@ A fast, SEO-friendly, **bilingual (Hindi + English)** blog about Sanatan Dharma.
 ```bash
 npm install
 cp .env.example .env.local      # then fill in the values
-npm run db:seed                 # create/migrate tables and add 6 sample articles (Hindi + English)
+npm run db:seed                 # create indexes and add 6 sample articles (Hindi + English)
 npm run dev
 ```
 
@@ -40,18 +41,31 @@ npm run dev
 
 Put your Google email(s) in `ADMIN_EMAILS` (comma-separated). After you log in with that account, the user menu shows **Admin Dashboard** and **नया लेख लिखें**.
 
-## Deploying (e.g. Vercel)
+### MongoDB
 
-A SQLite file does not persist on serverless hosts, so use [Turso](https://turso.tech) (hosted libSQL, free tier):
+Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas), then:
 
-```bash
-turso db create sanatan-blogs
-turso db show sanatan-blogs --url        # -> DATABASE_URL (libsql://...)
-turso db tokens create sanatan-blogs     # -> DATABASE_AUTH_TOKEN
-DATABASE_URL=... DATABASE_AUTH_TOKEN=... npm run db:setup
-```
+1. **Database Access** → create a user with a password.
+2. **Network Access** → allow your IP (and your server's IP, or 0.0.0.0/0 for a quick start).
+3. Copy the connection string into `MONGODB_URI`, with the database name in the path, e.g.
+   `mongodb+srv://user:pass@cluster0.xxxx.mongodb.net/Sanatan-blogs2?retryWrites=true&w=majority`
+4. Run `npm run db:seed` once to create indexes.
 
-Set every variable from `.env.example` in your host. Point `NEXT_PUBLIC_SITE_URL` and `BETTER_AUTH_URL` at your real domain. After deploying, submit `https://your-domain.com/sitemap.xml` in [Google Search Console](https://search.google.com/search-console). Put the site verification token in `GOOGLE_SITE_VERIFICATION`.
+### Cloudinary
+
+Sign up at [cloudinary.com](https://cloudinary.com), open the Dashboard and copy **Cloud name**, **API Key**
+and **API Secret** into the `CLOUDINARY_*` variables. Uploads go to the `sanatan-blogs/uploads` folder,
+and only signed-in admins can upload (`/api/upload`).
+
+## Deploying
+
+Set every variable from `.env.example` on your host (Vercel, EC2, …) and point `NEXT_PUBLIC_SITE_URL` and
+`BETTER_AUTH_URL` at your real domain. Nothing is stored on disk, so any host works. Run `npm run db:seed`
+once against the production database.
+
+After deploying, submit `https://your-domain.com/sitemap.xml` in
+[Google Search Console](https://search.google.com/search-console) and put the verification token in
+`GOOGLE_SITE_VERIFICATION`.
 
 ## Project structure
 
@@ -67,14 +81,16 @@ app/[lang]/
   opengraph-image.tsx      Default share image
 app/
   actions.ts               Server actions: like, comment, save/delete post
+  api/upload/              Admin-only Cloudinary upload/delete endpoint
   sitemap.ts robots.ts feed.xml/ manifest.ts api/auth/
 components/                UI components
 lib/
   i18n.ts                  Locales, URL helpers and the Hindi/English UI dictionaries
   locale.ts                Server helpers: current locale, hreflang alternates
   auth.ts auth-client.ts   Better Auth (Google) + admin check
-  db/                      Drizzle schema + client
-  posts.ts                 Data queries
+  db.ts                    MongoDB client, collections and document types
+  cloudinary.ts            Image upload/delete helpers
+  posts.ts                 Data queries (aggregations with like/comment counts)
   site.ts                  Site config + categories
-scripts/setup-db.mjs       Creates tables / seeds sample posts
+scripts/setup-db.mjs       Creates indexes / seeds sample posts
 ```

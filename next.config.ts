@@ -2,8 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Allow cover images from any HTTPS host (admins paste image URLs)
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
+    remotePatterns: [
+      // Uploaded covers live on Cloudinary; the wildcard also allows pasted image URLs
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "**" },
+    ],
   },
   poweredByHeader: false,
 };

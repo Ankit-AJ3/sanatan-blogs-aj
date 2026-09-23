@@ -1,136 +1,72 @@
-// Creates all tables (idempotent) and optionally seeds sample articles.
+// Creates MongoDB indexes (idempotent) and optionally seeds sample articles.
 // Usage: node --env-file-if-exists=.env.local scripts/setup-db.mjs [--seed]
-import { createClient } from "@libsql/client";
-import { mkdirSync } from "node:fs";
+import { MongoClient } from "mongodb";
 import { seedPosts } from "./seed-posts.mjs";
 import { seedPostsEn } from "./seed-posts-en.mjs";
 
-const url = process.env.DATABASE_URL ?? "file:./data/sanatan.db";
-if (url.startsWith("file:")) mkdirSync("./data", { recursive: true });
-
-const db = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN || undefined });
-
-const statements = [
-  `PRAGMA foreign_keys = ON`,
-  `CREATE TABLE IF NOT EXISTS user (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    email_verified INTEGER NOT NULL DEFAULT 0,
-    image TEXT,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS session (
-    id TEXT PRIMARY KEY,
-    expires_at INTEGER NOT NULL,
-    token TEXT NOT NULL UNIQUE,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL,
-    ip_address TEXT,
-    user_agent TEXT,
-    user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE
-  )`,
-  `CREATE INDEX IF NOT EXISTS session_user_idx ON session(user_id)`,
-  `CREATE TABLE IF NOT EXISTS account (
-    id TEXT PRIMARY KEY,
-    account_id TEXT NOT NULL,
-    provider_id TEXT NOT NULL,
-    user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    access_token TEXT,
-    refresh_token TEXT,
-    id_token TEXT,
-    access_token_expires_at INTEGER,
-    refresh_token_expires_at INTEGER,
-    scope TEXT,
-    password TEXT,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
-  )`,
-  `CREATE INDEX IF NOT EXISTS account_user_idx ON account(user_id)`,
-  `CREATE TABLE IF NOT EXISTS verification (
-    id TEXT PRIMARY KEY,
-    identifier TEXT NOT NULL,
-    value TEXT NOT NULL,
-    expires_at INTEGER NOT NULL,
-    created_at INTEGER,
-    updated_at INTEGER
-  )`,
-  `CREATE INDEX IF NOT EXISTS verification_identifier_idx ON verification(identifier)`,
-  `CREATE TABLE IF NOT EXISTS posts (
-    id TEXT PRIMARY KEY,
-    slug TEXT NOT NULL UNIQUE,
-    title TEXT NOT NULL,
-    excerpt TEXT NOT NULL,
-    content TEXT NOT NULL,
-    title_en TEXT,
-    excerpt_en TEXT,
-    content_en TEXT,
-    cover_image TEXT,
-    category TEXT NOT NULL,
-    tags TEXT NOT NULL DEFAULT '',
-    author_id TEXT REFERENCES user(id) ON DELETE SET NULL,
-    author_name TEXT NOT NULL,
-    published INTEGER NOT NULL DEFAULT 0,
-    featured INTEGER NOT NULL DEFAULT 0,
-    reading_time INTEGER NOT NULL DEFAULT 1,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL,
-    published_at INTEGER
-  )`,
-  `CREATE INDEX IF NOT EXISTS posts_category_idx ON posts(category)`,
-  `CREATE INDEX IF NOT EXISTS posts_published_idx ON posts(published, published_at)`,
-  `CREATE TABLE IF NOT EXISTS likes (
-    post_id TEXT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-    user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    created_at INTEGER NOT NULL,
-    PRIMARY KEY (post_id, user_id)
-  )`,
-  `CREATE TABLE IF NOT EXISTS comments (
-    id TEXT PRIMARY KEY,
-    post_id TEXT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-    user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    content TEXT NOT NULL,
-    created_at INTEGER NOT NULL
-  )`,
-  `CREATE INDEX IF NOT EXISTS comments_post_idx ON comments(post_id, created_at)`,
-];
-
-await db.batch(statements, "write");
-
-// Migrations for databases created before a column existed
-const postColumns = (await db.execute("PRAGMA table_info(posts)")).rows.map((r) => r.name);
-for (const col of ["title_en", "excerpt_en", "content_en"]) {
-  if (!postColumns.includes(col)) await db.execute(`ALTER TABLE posts ADD COLUMN ${col} TEXT`);
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+  console.error("✖ MONGODB_URI is not set. Copy .env.example to .env.local and fill it in.");
+  process.exit(1);
 }
-console.log("✔ Tables ready");
+
+const client = new MongoClient(uri, { serverSelectionTimeoutMS: 20000 });
+await client.connect();
+const db = client.db();
+console.log(`✔ Connected to database "${db.databaseName}"`);
+
+await Promise.all([
+  db.collection("posts").createIndexes([
+    { key: { slug: 1 }, unique: true, name: "slug_unique" },
+    { key: { published: 1, publishedAt: -1 }, name: "published_recent" },
+    { key: { category: 1, publishedAt: -1 }, name: "category_recent" },
+    { key: { featured: 1 }, name: "featured" },
+  ]),
+  // One like per user per post
+  db.collection("likes").createIndexes([
+    { key: { postId: 1, userId: 1 }, unique: true, name: "post_user_unique" },
+    { key: { postId: 1 }, name: "post" },
+  ]),
+  db.collection("comments").createIndexes([{ key: { postId: 1, createdAt: -1 }, name: "post_recent" }]),
+  // Better Auth collections
+  db.collection("user").createIndexes([{ key: { email: 1 }, unique: true, name: "email_unique" }]),
+  db.collection("session").createIndexes([{ key: { token: 1 }, unique: true, name: "token_unique" }]),
+  db.collection("account").createIndexes([{ key: { userId: 1 }, name: "user" }]),
+]);
+console.log("✔ Indexes ready");
 
 if (process.argv.includes("--seed")) {
   const day = 24 * 60 * 60 * 1000;
   let inserted = 0;
   for (const [i, p] of seedPosts.entries()) {
-    const ts = Date.now() - (i + 1) * 3 * day;
+    if (await db.collection("posts").findOne({ slug: p.slug }, { projection: { _id: 1 } })) continue;
+    const ts = new Date(Date.now() - (i + 1) * 3 * day);
+    const en = seedPostsEn[p.slug] ?? null;
     const words = p.content.split(/\s+/).filter(Boolean).length;
-    const res = await db.execute({
-      sql: `INSERT OR IGNORE INTO posts
-        (id, slug, title, excerpt, content, cover_image, category, tags, author_id, author_name,
-         published, featured, reading_time, created_at, updated_at, published_at)
-        VALUES (?, ?, ?, ?, ?, NULL, ?, ?, NULL, ?, 1, ?, ?, ?, ?, ?)`,
-      args: [
-        crypto.randomUUID(), p.slug, p.title, p.excerpt, p.content.trim(), p.category, p.tags,
-        "Sanatan Blogs Team", i === 0 ? 1 : 0, Math.max(1, Math.round(words / 200)), ts, ts, ts,
-      ],
+    await db.collection("posts").insertOne({
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      content: p.content.trim(),
+      titleEn: en?.title ?? null,
+      excerptEn: en?.excerpt ?? null,
+      contentEn: en?.content.trim() ?? null,
+      coverImage: null,
+      coverImageId: null,
+      category: p.category,
+      tags: p.tags,
+      authorId: null,
+      authorName: "Sanatan Blogs Team",
+      published: true,
+      featured: i === 0,
+      readingTime: Math.max(1, Math.round(words / 200)),
+      createdAt: ts,
+      updatedAt: ts,
+      publishedAt: ts,
     });
-    inserted += res.rowsAffected;
-    const en = seedPostsEn[p.slug];
-    if (en) {
-      await db.execute({
-        sql: "UPDATE posts SET title_en = ?, excerpt_en = ?, content_en = ? WHERE slug = ? AND title_en IS NULL",
-        args: [en.title, en.excerpt, en.content.trim(), p.slug],
-      });
-    }
+    inserted++;
   }
   console.log(`✔ Seeded ${inserted} sample article(s)`);
 }
 
-db.close();
+await client.close();

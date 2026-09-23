@@ -4,7 +4,8 @@ import { useActionState, useRef, useState } from "react";
 import { savePost, type PostFormState } from "@/app/actions";
 import { useLocale } from "@/components/LocaleProvider";
 import { Markdown } from "@/components/Markdown";
-import type { Post } from "@/lib/db/schema";
+import { ImageUpload, uploadToCloudinary } from "./ImageUpload";
+import type { Post } from "@/lib/posts";
 import type { Locale } from "@/lib/i18n";
 import { categories, categoryText } from "@/lib/site";
 import { slugify } from "@/lib/utils";
@@ -37,6 +38,9 @@ export function PostEditor({ post }: { post?: Post }) {
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(!!post);
   const [tab, setTab] = useState<"write" | "preview">("write");
+  const [cover, setCover] = useState({ url: post?.coverImage ?? null, publicId: post?.coverImageId ?? null });
+  const [inserting, setInserting] = useState(false);
+  const imageInput = useRef<HTMLInputElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
 
   const cur = fields[contentLang];
@@ -54,6 +58,29 @@ export function PostEditor({ post }: { post?: Post }) {
       el.focus();
       el.setSelectionRange(s + prefix.length, s + prefix.length + selected.length);
     });
+  }
+
+  function insertAtCursor(markdown: string) {
+    const el = textarea.current;
+    const value = el?.value ?? cur.content;
+    const at = el?.selectionStart ?? value.length;
+    const gap = at > 0 && value[at - 1] !== "\n" ? "\n\n" : "";
+    set("content", `${value.slice(0, at)}${gap}${markdown}\n\n${value.slice(at)}`);
+    requestAnimationFrame(() => el?.focus());
+  }
+
+  /** Uploads a photo and drops it into the article at the cursor. */
+  async function insertImage(file: File | undefined) {
+    if (!file) return;
+    setInserting(true);
+    try {
+      const image = await uploadToCloudinary(file);
+      insertAtCursor(`![${file.name.replace(/\.[^.]+$/, "")}](${image.url})`);
+    } catch {
+      alert(t.editor.upload.errors.upload_failed);
+    } finally {
+      setInserting(false);
+    }
   }
 
   // English slugs rank better, so prefer the English title when auto-generating
@@ -161,6 +188,25 @@ export function PostEditor({ post }: { post?: Post }) {
                   {tb.label}
                 </button>
               ))}
+              <span className="mx-1 w-px bg-line" aria-hidden />
+              <button
+                type="button"
+                onClick={() => imageInput.current?.click()}
+                disabled={inserting}
+                className="rounded-lg px-2 py-1 text-sm font-bold hover:bg-surface disabled:opacity-60"
+              >
+                {inserting ? t.editor.upload.uploading : t.editor.upload.insert}
+              </button>
+              <input
+                ref={imageInput}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(ev) => {
+                  insertImage(ev.target.files?.[0]);
+                  ev.target.value = "";
+                }}
+              />
             </div>
             <textarea
               ref={textarea}
@@ -258,17 +304,10 @@ export function PostEditor({ post }: { post?: Post }) {
             <p className="mt-1 text-xs text-muted">{t.editor.tagsHint}</p>
           </div>
           <div>
-            <label htmlFor="coverImage" className="mb-1.5 block font-semibold">
-              {t.editor.cover}
-            </label>
-            <input
-              id="coverImage"
-              name="coverImage"
-              type="url"
-              defaultValue={post?.coverImage ?? ""}
-              placeholder="https://…/image.jpg"
-              className={`${input} text-sm`}
-            />
+            <p className="mb-1.5 font-semibold">{t.editor.cover}</p>
+            <input type="hidden" name="coverImage" value={cover.url ?? ""} />
+            <input type="hidden" name="coverImageId" value={cover.publicId ?? ""} />
+            <ImageUpload value={cover.url} publicId={cover.publicId} onChange={setCover} />
             <p className="mt-1 text-xs text-muted">{t.editor.coverHint}</p>
           </div>
         </div>
