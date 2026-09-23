@@ -7,7 +7,7 @@ A fast, SEO-friendly, **bilingual (Hindi + English)** blog about Sanatan Dharma.
 - 🌐 **Hindi + English**: Hindi is the default language at `/…`, and English lives at `/en/…`. The **हि | EN** switcher in the header keeps you on the same page. Articles have optional English translations (a Hindi/English tab in the editor). An untranslated article opens in English with a “Hindi only” note, and its canonical URL points to the Hindi original.
 - ✍️ **Admin panel** (`/admin`) where you can write, edit, delete, draft and feature articles in Markdown, with a toolbar, live preview, SEO character counters and a Google-result preview
 - 🖼️ **Image uploads to Cloudinary**: drag & drop a cover photo, or upload a photo straight into the article body. Replacing or deleting a post removes its image from Cloudinary too. Posts without a cover get an auto-generated gradient.
-- 🔐 **Google sign-in**: readers log in with one click
+- 🔐 **Two ways to sign in**: Google in one click, or a normal email + password form. New email accounts are verified with a 6-digit OTP sent by mail, and "forgot password" uses the same OTP flow.
 - 🙏 **Likes** (optimistic UI) and 💬 **comments** (users can delete their own comments; admins can delete any)
 - 🔍 Search, categories, pagination, related posts, table of contents and share buttons (WhatsApp, Facebook, X, Telegram)
 - 🌗 Light/dark theme, Devanagari fonts (Mukta and Noto Serif Devanagari), mobile-first layout
@@ -51,6 +51,18 @@ Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas), then:
    `mongodb+srv://user:pass@cluster0.xxxx.mongodb.net/Sanatan-blogs2?retryWrites=true&w=majority`
 4. Run `npm run db:seed` once to create indexes.
 
+### Email (for OTP codes)
+
+Pick one provider and fill in `.env.local`:
+
+- **Resend** (simplest): create an account at [resend.com](https://resend.com), verify a domain, then set
+  `RESEND_API_KEY` and `EMAIL_FROM`.
+- **SMTP** (e.g. Gmail with an [app password](https://myaccount.google.com/apppasswords)): set `SMTP_HOST`,
+  `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` and `EMAIL_FROM`.
+
+With neither set, codes are **printed in the dev server terminal** so you can test sign-up locally. In
+production the app refuses to send instead of silently dropping the mail.
+
 ### Cloudinary
 
 Sign up at [cloudinary.com](https://cloudinary.com), open the Dashboard and copy **Cloud name**, **API Key**
@@ -87,7 +99,8 @@ components/                UI components
 lib/
   i18n.ts                  Locales, URL helpers and the Hindi/English UI dictionaries
   locale.ts                Server helpers: current locale, hreflang alternates
-  auth.ts auth-client.ts   Better Auth (Google) + admin check
+  auth.ts auth-client.ts   Better Auth (Google + email/password + OTP) and the admin check
+  email.ts                 Sends the OTP mail via Resend or SMTP
   db.ts                    MongoDB client, collections and document types
   cloudinary.ts            Image upload/delete helpers
   posts.ts                 Data queries (aggregations with like/comment counts)

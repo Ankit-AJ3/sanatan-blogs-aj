@@ -4,6 +4,7 @@ import { timeAgo } from "@/lib/utils";
 import { Avatar } from "./Avatar";
 import { CommentIcon } from "./icons";
 import { CommentForm, DeleteCommentButton } from "./CommentForm";
+import Link from "next/link";
 import { SignInButton } from "./SignInButton";
 
 type Comment = {
@@ -46,6 +47,12 @@ export async function Comments({
           <div className="py-4 text-center">
             <p className="mb-4 text-muted">{t.comments.loginPrompt}</p>
             <SignInButton callbackURL={`${localePath(lang, `/blog/${slug}`)}#comments`} />
+            <Link
+              href={`${localePath(lang, "/login")}?next=${encodeURIComponent(`${localePath(lang, `/blog/${slug}`)}#comments`)}`}
+              className="mt-3 inline-block text-sm font-semibold text-saffron hover:underline"
+            >
+              {t.comments.emailLogin}
+            </Link>
           </div>
         )}
       </div>
