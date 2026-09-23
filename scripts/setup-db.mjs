@@ -6,14 +6,14 @@ import { seedPostsEn } from "./seed-posts-en.mjs";
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  console.error("✖ MONGODB_URI is not set. Copy .env.example to .env.local and fill it in.");
+  console.error("MONGODB_URI is not set. Copy .env.example to .env.local and fill it in.");
   process.exit(1);
 }
 
 const client = new MongoClient(uri, { serverSelectionTimeoutMS: 20000 });
 await client.connect();
 const db = client.db();
-console.log(`✔ Connected to database "${db.databaseName}"`);
+console.log(`Connected to database "${db.databaseName}"`);
 
 await Promise.all([
   db.collection("posts").createIndexes([
@@ -33,7 +33,7 @@ await Promise.all([
   db.collection("session").createIndexes([{ key: { token: 1 }, unique: true, name: "token_unique" }]),
   db.collection("account").createIndexes([{ key: { userId: 1 }, name: "user" }]),
 ]);
-console.log("✔ Indexes ready");
+console.log("Indexes ready");
 
 if (process.argv.includes("--seed")) {
   const day = 24 * 60 * 60 * 1000;
@@ -66,7 +66,7 @@ if (process.argv.includes("--seed")) {
     });
     inserted++;
   }
-  console.log(`✔ Seeded ${inserted} sample article(s)`);
+  console.log(`Seeded ${inserted} sample article(s)`);
 }
 
 await client.close();

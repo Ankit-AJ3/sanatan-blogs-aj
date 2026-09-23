@@ -47,7 +47,7 @@ export default async function AboutPage() {
             <h2>Join us</h2>
             <p>
               <Link href={login}>Sign in</Link> with Google to like articles and share your thoughts in the comments.
-              Please keep the discussion kind and respectful. 🙏
+              Please keep the discussion kind and respectful.
             </p>
           </>
         ) : (
@@ -71,7 +71,7 @@ export default async function AboutPage() {
             <h2>जुड़ें</h2>
             <p>
               Google से <Link href={login}>लॉगिन</Link> करके आप लेखों को पसंद कर सकते हैं और अपने विचार टिप्पणी के रूप में
-              साझा कर सकते हैं। कृपया टिप्पणियों में शालीनता और सम्मान बनाए रखें। 🙏
+              साझा कर सकते हैं। कृपया टिप्पणियों में शालीनता और सम्मान बनाए रखें।
             </p>
           </>
         )}

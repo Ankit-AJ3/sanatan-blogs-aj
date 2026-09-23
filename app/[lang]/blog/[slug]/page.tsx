@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { Comments } from "@/components/Comments";
 import { CoverArt } from "@/components/CoverArt";
+import { CategoryIcon, GlobeIcon, InfoIcon } from "@/components/icons";
 import { JsonLd } from "@/components/JsonLd";
 import { LikeButton } from "@/components/LikeButton";
 import { Markdown, extractHeadings } from "@/components/Markdown";
@@ -158,24 +159,30 @@ export default async function PostPage({ params }: PageProps<"/[lang]/blog/[slug
               {cat && catText && (
                 <Link
                   href={localePath(lang, `/category/${cat.slug}`)}
-                  className="inline-block rounded-full bg-saffron-soft px-3 py-1 text-sm font-semibold text-saffron"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-saffron-soft px-3 py-1 text-sm font-semibold text-saffron"
                 >
-                  {cat.icon} {catText.name}
+                  <CategoryIcon slug={cat.slug} className="size-4" />
+                  {catText.name}
                 </Link>
               )}
               {showOtherLink && (
                 <Link
                   href={localePath(otherLang, path)}
                   hrefLang={bcp47[otherLang]}
-                  className="rounded-full border border-line px-3 py-1 text-sm font-semibold text-muted hover:border-saffron hover:text-saffron"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-sm font-semibold text-muted hover:border-saffron hover:text-saffron"
                 >
-                  {otherLang === "en" ? "🌐 Read in English" : "🌐 हिन्दी में पढ़ें"}
+                  <GlobeIcon className="size-4" aria-hidden />
+                  {otherLang === "en" ? "Read in English" : "हिन्दी में पढ़ें"}
                 </Link>
               )}
             </div>
             {text.contentLang !== lang && (
-              <p lang={lang} className="mt-4 rounded-xl border border-gold/40 bg-saffron-soft px-4 py-2 text-sm">
-                ℹ️ {t.post.onlyInOther}
+              <p
+                lang={lang}
+                className="mt-4 flex items-center gap-2 rounded-xl border border-gold/40 bg-saffron-soft px-4 py-2 text-sm"
+              >
+                <InfoIcon className="size-4 shrink-0" aria-hidden />
+                {t.post.onlyInOther}
               </p>
             )}
             <h1 className="mt-4 font-serif text-3xl font-bold leading-tight md:text-5xl md:leading-tight">{text.title}</h1>

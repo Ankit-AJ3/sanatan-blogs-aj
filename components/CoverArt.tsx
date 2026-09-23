@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getCategory } from "@/lib/site";
+import { CategoryIcon } from "./icons";
 
 /** Cover image if provided, otherwise a decorative gradient based on the category. */
 export function CoverArt({
@@ -40,7 +41,12 @@ export function CoverArt({
       role="img"
       aria-label={title}
     >
-      <svg className="absolute inset-0 size-full opacity-20" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      <svg
+        className="absolute inset-0 size-full opacity-20"
+        viewBox="0 0 200 200"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden
+      >
         <g fill="none" stroke="#fff" strokeWidth="0.6">
           {Array.from({ length: 12 }).map((_, i) => (
             <ellipse key={i} cx="100" cy="100" rx="80" ry="28" transform={`rotate(${i * 15} 100 100)`} />
@@ -49,9 +55,10 @@ export function CoverArt({
           <circle cx="100" cy="100" r="92" />
         </g>
       </svg>
-      <span className="relative text-6xl drop-shadow-lg transition-transform duration-500 group-hover:scale-110" aria-hidden>
-        {cat?.icon ?? "🕉️"}
-      </span>
+      <CategoryIcon
+        slug={category}
+        className="relative size-16 text-white/90 drop-shadow-lg transition-transform duration-500 group-hover:scale-110"
+      />
     </div>
   );
 }

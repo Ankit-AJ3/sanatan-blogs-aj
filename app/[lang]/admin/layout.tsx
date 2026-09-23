@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdmin, getSession } from "@/lib/auth";
 import { localePath } from "@/lib/i18n";
+import { LockIcon } from "@/components/icons";
 import { getT } from "@/lib/locale";
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/[lang]/adm
   if (!(await getAdmin())) {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <p className="text-5xl">🔒</p>
+        <LockIcon className="mx-auto size-12 text-saffron" aria-hidden />
         <h1 className="mt-4 font-serif text-2xl font-bold">{t.admin.denied}</h1>
         <p className="mt-2 text-muted">{t.admin.deniedText}</p>
         <Link href={localePath(lang, "/")} className="mt-6 inline-block font-semibold text-saffron">

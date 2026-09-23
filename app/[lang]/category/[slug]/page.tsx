@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { CategoryIcon } from "@/components/icons";
 import { PageHeader } from "@/components/PageHeader";
 import { Pagination } from "@/components/Pagination";
 import { PostGrid } from "@/components/PostCard";
@@ -45,7 +46,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
       <PageHeader
         title={text.name}
         description={text.description}
-        icon={cat.icon}
+        icon={<CategoryIcon slug={cat.slug} className="size-9 text-saffron" />}
         crumbs={[
           { name: t.category.title, href: "/category" },
           { name: text.name, href: `/category/${cat.slug}` },

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CoverArt } from "@/components/CoverArt";
+import { ArrowRightIcon, CategoryIcon, CommentIcon, LikeIcon, PopularIcon, QuoteIcon, StarIcon } from "@/components/icons";
 import { PostGrid } from "@/components/PostCard";
 import { localePath, localizePost } from "@/lib/i18n";
 import { getT } from "@/lib/locale";
@@ -75,7 +76,10 @@ export default async function Home() {
               />
               <div className="flex flex-col justify-center p-7 md:p-10">
                 <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-saffron">
-                  <span>⭐ {t.home.featured}</span>
+                  <span className="flex items-center gap-1.5">
+                    <StarIcon className="size-4" aria-hidden />
+                    {t.home.featured}
+                  </span>
                   {heroCat && (
                     <>
                       <span className="text-line">•</span>
@@ -98,7 +102,8 @@ export default async function Home() {
                   {hero.authorName} · {formatDate(hero.publishedAt, lang)} · {t.post.minRead(hero.readingTime)}
                 </p>
                 <span className="mt-6 inline-flex w-fit items-center gap-2 font-semibold text-saffron">
-                  {t.home.readMore} <span className="transition-transform group-hover:translate-x-1">→</span>
+                  {t.home.readMore}
+                  <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
                 </span>
               </div>
             </article>
@@ -122,17 +127,13 @@ export default async function Home() {
                 className="group relative overflow-hidden rounded-2xl p-5 text-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                 style={{ background: `linear-gradient(135deg, ${c.gradient[0]}, ${c.gradient[1]})` }}
               >
-                <span className="text-3xl" aria-hidden>
-                  {c.icon}
-                </span>
+                <CategoryIcon slug={c.slug} className="size-8" />
                 <p className="mt-3 font-serif text-lg font-bold leading-tight">{categoryText(c, lang).name}</p>
                 <p className="text-sm text-white/80">{t.post.articles(counts[c.slug] ?? 0)}</p>
-                <span
-                  className="absolute -bottom-6 -right-4 text-8xl opacity-10 transition group-hover:opacity-20"
-                  aria-hidden
-                >
-                  {c.icon}
-                </span>
+                <CategoryIcon
+                  slug={c.slug}
+                  className="absolute -bottom-5 -right-3 size-24 opacity-10 transition group-hover:opacity-20"
+                />
               </Link>
             ))}
           </div>
@@ -152,7 +153,8 @@ export default async function Home() {
           </div>
           <aside aria-labelledby="popular-heading" className="lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-3xl border border-line bg-surface p-6">
-              <h2 id="popular-heading" className="font-serif text-xl font-bold">
+              <h2 id="popular-heading" className="flex items-center gap-2 font-serif text-xl font-bold">
+                <PopularIcon className="size-5 text-saffron" aria-hidden />
                 {t.home.popular}
               </h2>
               <ol className="mt-4 space-y-4">
@@ -169,8 +171,13 @@ export default async function Home() {
                         >
                           {text.title}
                         </Link>
-                        <p className="mt-1 text-xs text-muted">
-                          🙏 {p.likeCount} · 💬 {p.commentCount}
+                        <p className="mt-1 flex items-center gap-3 text-xs text-muted">
+                          <span className="flex items-center gap-1">
+                            <LikeIcon className="size-3.5" aria-hidden /> {p.likeCount}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <CommentIcon className="size-3.5" aria-hidden /> {p.commentCount}
+                          </span>
                         </p>
                       </div>
                     </li>
@@ -193,7 +200,9 @@ export default async function Home() {
 
         {/* Quote */}
         <section className="mt-24 rounded-[2rem] border border-line bg-surface px-6 py-14 text-center">
-          <p className="divider-ornament mx-auto max-w-xs text-2xl">✦</p>
+          <p className="divider-ornament mx-auto max-w-xs">
+            <QuoteIcon className="size-5" aria-hidden />
+          </p>
           <blockquote lang="sa" className="mx-auto mt-6 max-w-3xl font-serif text-2xl leading-relaxed md:text-3xl">
             “यदा यदा हि धर्मस्य ग्लानिर्भवति भारत। अभ्युत्थानमधर्मस्य तदात्मानं सृजाम्यहम्॥”
           </blockquote>
@@ -226,8 +235,9 @@ function SectionHeading({
         </h2>
         <p className="mt-1 text-muted">{subtitle}</p>
       </div>
-      <Link href={href} className="shrink-0 font-semibold text-saffron hover:underline">
+      <Link href={href} className="inline-flex shrink-0 items-center gap-1 font-semibold text-saffron hover:underline">
         {linkText}
+        <ArrowRightIcon className="size-4" aria-hidden />
       </Link>
     </div>
   );

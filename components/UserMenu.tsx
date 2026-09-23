@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { stripLocale } from "@/lib/i18n";
 import { Avatar } from "./Avatar";
+import { DashboardIcon, WriteIcon } from "./icons";
 import { useLocale } from "./LocaleProvider";
 
 export function UserMenu() {
@@ -58,11 +59,13 @@ export function UserMenu() {
           <nav className="p-1.5 text-sm" onClick={() => setOpen(false)}>
             {user.isAdmin && (
               <>
-                <Link href={href("/admin")} className="block rounded-lg px-3 py-2 hover:bg-surface-2">
-                  📋 {t.nav.admin}
+                <Link href={href("/admin")} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-surface-2">
+                  <DashboardIcon className="size-4" aria-hidden />
+                  {t.nav.admin}
                 </Link>
-                <Link href={href("/admin/new")} className="block rounded-lg px-3 py-2 hover:bg-surface-2">
-                  ✍️ {t.nav.newPost}
+                <Link href={href("/admin/new")} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-surface-2">
+                  <WriteIcon className="size-4" aria-hidden />
+                  {t.nav.newPost}
                 </Link>
               </>
             )}

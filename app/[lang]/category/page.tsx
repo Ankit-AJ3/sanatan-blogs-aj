@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CategoryIcon } from "@/components/icons";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary, isLocale, localePath } from "@/lib/i18n";
 import { alternatesFor, getT } from "@/lib/locale";
@@ -39,11 +40,11 @@ export default async function CategoriesPage() {
               className="group flex gap-4 rounded-3xl border border-line bg-surface p-6 transition hover:-translate-y-1 hover:border-saffron/50 hover:shadow-lg"
             >
               <span
-                className="grid size-16 shrink-0 place-items-center rounded-2xl text-3xl"
+                className="grid size-16 shrink-0 place-items-center rounded-2xl text-white"
                 style={{ background: `linear-gradient(135deg, ${c.gradient[0]}, ${c.gradient[1]})` }}
                 aria-hidden
               >
-                {c.icon}
+                <CategoryIcon slug={c.slug} className="size-7" />
               </span>
               <div>
                 <h2 className="font-serif text-xl font-bold group-hover:text-saffron">{text.name}</h2>

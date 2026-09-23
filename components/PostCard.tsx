@@ -5,6 +5,7 @@ import type { PostCardData } from "@/lib/posts";
 import { categoryText, getCategory } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 import { CoverArt } from "./CoverArt";
+import { CategoryIcon, CommentIcon, LampIcon, LikeIcon } from "./icons";
 
 function PostCardView({ post, lang, priority }: { post: PostCardData; lang: Locale; priority: boolean }) {
   const t = getDictionary(lang);
@@ -18,8 +19,9 @@ function PostCardView({ post, lang, priority }: { post: PostCardData; lang: Loca
           {cat && (
             <Link
               href={localePath(lang, `/category/${cat.slug}`)}
-              className="relative z-10 w-fit rounded-full bg-saffron-soft px-3 py-1 text-xs font-semibold text-saffron hover:brightness-95"
+              className="relative z-10 flex w-fit items-center gap-1.5 rounded-full bg-saffron-soft px-3 py-1 text-xs font-semibold text-saffron hover:brightness-95"
             >
+              <CategoryIcon slug={cat.slug} className="size-3.5" />
               {categoryText(cat, lang).name}
             </Link>
           )}
@@ -44,8 +46,12 @@ function PostCardView({ post, lang, priority }: { post: PostCardData; lang: Loca
             {t.post.minShort(post.readingTime)}
           </span>
           <span className="flex items-center gap-3">
-            <span aria-label={`${post.likeCount} likes`}>🙏 {post.likeCount}</span>
-            <span aria-label={`${post.commentCount} comments`}>💬 {post.commentCount}</span>
+            <span className="flex items-center gap-1" aria-label={`${post.likeCount} ${t.post.like}`}>
+              <LikeIcon className="size-4" aria-hidden /> {post.likeCount}
+            </span>
+            <span className="flex items-center gap-1" aria-label={`${post.commentCount} ${t.comments.title}`}>
+              <CommentIcon className="size-4" aria-hidden /> {post.commentCount}
+            </span>
           </span>
         </div>
       </div>
@@ -61,8 +67,8 @@ export async function PostGrid({ posts, columns = 3 }: { posts: PostCardData[]; 
   const lang = await getLocale();
   if (!posts.length) {
     return (
-      <div className="rounded-3xl border border-dashed border-line p-12 text-center text-muted">
-        <p className="text-4xl">🪔</p>
+      <div className="grid justify-items-center rounded-3xl border border-dashed border-line p-12 text-center text-muted">
+        <LampIcon className="size-8 text-saffron" aria-hidden />
         <p className="mt-3">{getDictionary(lang).post.empty}</p>
       </div>
     );

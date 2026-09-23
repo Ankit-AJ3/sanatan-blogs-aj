@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getT } from "@/lib/locale";
+import { ArrowLeftIcon, ArrowRightIcon } from "./icons";
 
 export async function Pagination({
   page,
@@ -26,7 +27,8 @@ export async function Pagination({
   return (
     <nav aria-label="Pagination" className="mt-12 flex flex-wrap items-center justify-center gap-2">
       {page > 1 && (
-        <Link href={href(page - 1)} rel="prev" className={`${btn} hover:border-saffron hover:text-saffron`}>
+        <Link href={href(page - 1)} rel="prev" className={`${btn} gap-1.5 hover:border-saffron hover:text-saffron`}>
+          <ArrowLeftIcon className="size-4" aria-hidden />
           {t.blog.prev}
         </Link>
       )}
@@ -41,8 +43,9 @@ export async function Pagination({
         </Link>
       ))}
       {page < totalPages && (
-        <Link href={href(page + 1)} rel="next" className={`${btn} hover:border-saffron hover:text-saffron`}>
+        <Link href={href(page + 1)} rel="next" className={`${btn} gap-1.5 hover:border-saffron hover:text-saffron`}>
           {t.blog.next}
+          <ArrowRightIcon className="size-4" aria-hidden />
         </Link>
       )}
     </nav>

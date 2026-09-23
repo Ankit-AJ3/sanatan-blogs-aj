@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 import { toggleLike } from "@/app/actions";
+import { LikeIcon } from "./icons";
 import { useLocale } from "./LocaleProvider";
 
 export function LikeButton({
@@ -52,9 +53,10 @@ export function LikeButton({
           : "border-line bg-surface text-ink hover:border-saffron hover:text-saffron"
       }`}
     >
-      <span className={`text-lg transition-transform ${state.liked ? "scale-110" : "group-hover:scale-110"}`} aria-hidden>
-        🙏
-      </span>
+      <LikeIcon
+        className={`size-5 transition-transform ${state.liked ? "scale-110 fill-current" : "group-hover:scale-110"}`}
+        aria-hidden
+      />
       <span>{state.liked ? t.post.liked : t.post.like}</span>
       <span className={`rounded-full px-2 py-0.5 text-sm ${state.liked ? "bg-white/20" : "bg-surface-2"}`}>{state.count}</span>
     </button>

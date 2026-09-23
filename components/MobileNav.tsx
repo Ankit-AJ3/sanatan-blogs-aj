@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { CloseIcon, MenuIcon } from "./icons";
 import { useLocale } from "./LocaleProvider";
 
 export function MobileNav({ links }: { links: { href: string; label: string }[] }) {
@@ -16,9 +17,7 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
         aria-expanded={open}
         className="grid size-10 place-items-center rounded-full text-ink hover:bg-surface-2"
       >
-        <svg className="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-          {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
-        </svg>
+        {open ? <CloseIcon className="size-6" aria-hidden /> : <MenuIcon className="size-6" aria-hidden />}
       </button>
       {open && (
         <nav

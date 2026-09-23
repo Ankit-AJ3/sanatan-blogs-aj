@@ -2,6 +2,7 @@ import { localePath } from "@/lib/i18n";
 import { getT } from "@/lib/locale";
 import { timeAgo } from "@/lib/utils";
 import { Avatar } from "./Avatar";
+import { CommentIcon } from "./icons";
 import { CommentForm, DeleteCommentButton } from "./CommentForm";
 import { SignInButton } from "./SignInButton";
 
@@ -29,7 +30,10 @@ export async function Comments({
   return (
     <section id="comments" aria-labelledby="comments-heading" className="scroll-mt-24">
       <h2 id="comments-heading" className="font-serif text-2xl font-bold">
-        {t.comments.title} <span className="text-muted">({comments.length})</span>
+        <span className="flex items-center gap-2">
+          <CommentIcon className="size-5 text-saffron" aria-hidden />
+          {t.comments.title} <span className="text-muted">({comments.length})</span>
+        </span>
       </h2>
 
       <div className="mt-6 rounded-3xl border border-line bg-surface p-5">

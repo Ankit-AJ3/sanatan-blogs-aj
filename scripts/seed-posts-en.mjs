@@ -98,7 +98,7 @@ In a diya, the **clay** represents the body, the **oil** our actions, the **wick
 - Light a lamp in the home of someone in need.
 - Use clay diyas and support local artisans.
 
-**Happy Diwali!** 🪔
+**Happy Diwali!**
 `,
   },
   "12-jyotirlinga-yatra-guide": {
@@ -133,7 +133,7 @@ According to the Shiva Purana, the places where Lord Shiva manifested himself as
 
 > सौराष्ट्रे सोमनाथं च श्रीशैले मल्लिकार्जुनम्…
 
-**Har Har Mahadev!** 🔱
+**Har Har Mahadev!**
 `,
   },
   "pranayam-ke-prakar-aur-labh": {
@@ -198,7 +198,7 @@ The great scholar Ravana fell because of his arrogance.
 
 > सियाराम मय सब जग जानी। करउँ प्रनाम जोरि जुग पानी॥
 
-**Jai Shri Ram!** 🙏
+**Jai Shri Ram!**
 `,
   },
 };

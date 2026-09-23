@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useTransition } from "react";
 import { addComment, deleteComment, type CommentState } from "@/app/actions";
+import { TrashIcon } from "./icons";
 import { useLocale } from "./LocaleProvider";
 
 export function CommentForm({ postId }: { postId: string }) {
@@ -53,8 +54,9 @@ export function DeleteCommentButton({ commentId }: { commentId: string }) {
       onClick={() => {
         if (confirm(t.comments.confirmDelete)) start(() => deleteComment(commentId));
       }}
-      className="ml-auto text-xs text-muted hover:text-red-600 disabled:opacity-50"
+      className="ml-auto inline-flex items-center gap-1 text-xs text-muted hover:text-red-600 disabled:opacity-50"
     >
+      <TrashIcon className="size-3.5" aria-hidden />
       {pending ? t.comments.deleting : t.comments.delete}
     </button>
   );

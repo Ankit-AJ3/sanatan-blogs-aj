@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { localePath } from "@/lib/i18n";
 import { getT } from "@/lib/locale";
+import { SearchIcon } from "./icons";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
@@ -37,10 +38,7 @@ export async function Header() {
             aria-label={t.nav.search}
             className="hidden size-10 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-ink sm:grid"
           >
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
+            <SearchIcon className="size-5" aria-hidden />
           </Link>
           <LanguageSwitcher />
           <ThemeToggle />

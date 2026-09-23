@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { CheckIcon } from "@/components/icons";
 import { SignInButton } from "@/components/SignInButton";
 import { getSession } from "@/lib/auth";
 import { getDictionary, isLocale, localePath } from "@/lib/i18n";
@@ -35,7 +36,10 @@ export default async function LoginPage({ searchParams }: PageProps<"/[lang]/log
         </div>
         <ul className="mt-8 space-y-2 text-left text-sm text-muted">
           {t.login.points.map((p) => (
-            <li key={p}>✦ {p}</li>
+            <li key={p} className="flex items-start gap-2">
+              <CheckIcon className="mt-0.5 size-4 shrink-0 text-saffron" aria-hidden />
+              {p}
+            </li>
           ))}
         </ul>
       </div>

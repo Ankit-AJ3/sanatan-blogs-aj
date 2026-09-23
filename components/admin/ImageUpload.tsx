@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { ImageIcon } from "@/components/icons";
 import { useLocale } from "@/components/LocaleProvider";
 
 export type UploadedImage = { url: string; publicId: string; width: number; height: number };
@@ -108,9 +109,7 @@ export function ImageUpload({
             </>
           ) : (
             <>
-              <span className="text-2xl" aria-hidden>
-                🖼️
-              </span>
+              <ImageIcon className="size-7 text-saffron" aria-hidden />
               <span className="font-semibold">{e.choose}</span>
               <span className="text-xs text-muted">{e.hint}</span>
             </>

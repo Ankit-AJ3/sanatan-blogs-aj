@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DeletePostButton } from "@/components/admin/DeletePostButton";
+import { CommentIcon, LikeIcon, PostsIcon, StarIcon, UsersIcon, WriteIcon } from "@/components/icons";
 import { localePath } from "@/lib/i18n";
 import { getT } from "@/lib/locale";
 import { getAdminStats, getAllPostsForAdmin } from "@/lib/posts";
@@ -19,8 +20,9 @@ export default async function AdminPage() {
         </div>
         <Link
           href={localePath(lang, "/admin/new")}
-          className="rounded-full bg-gradient-to-r from-saffron to-maroon px-5 py-2.5 font-semibold text-white shadow-md hover:brightness-110"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-saffron to-maroon px-5 py-2.5 font-semibold text-white shadow-md hover:brightness-110"
         >
+          <WriteIcon className="size-4" aria-hidden />
           {t.admin.newPost}
         </Link>
       </div>
@@ -28,14 +30,14 @@ export default async function AdminPage() {
       <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         {(
           [
-            ["📝", t.admin.stats.posts, stats.posts],
-            ["🙏", t.admin.stats.likes, stats.likes],
-            ["💬", t.admin.stats.comments, stats.comments],
-            ["👥", t.admin.stats.users, stats.users],
+            [PostsIcon, t.admin.stats.posts, stats.posts],
+            [LikeIcon, t.admin.stats.likes, stats.likes],
+            [CommentIcon, t.admin.stats.comments, stats.comments],
+            [UsersIcon, t.admin.stats.users, stats.users],
           ] as const
-        ).map(([icon, label, n]) => (
+        ).map(([Icon, label, n]) => (
           <div key={label} className="rounded-2xl border border-line bg-surface p-5">
-            <p className="text-2xl">{icon}</p>
+            <Icon className="size-6 text-saffron" aria-hidden />
             <p className="mt-2 text-3xl font-bold">{n}</p>
             <p className="text-sm text-muted">{label}</p>
           </div>
@@ -50,7 +52,11 @@ export default async function AdminPage() {
               <th className="px-4 py-3 font-semibold">{t.admin.cols.category}</th>
               <th className="px-4 py-3 font-semibold">{t.admin.cols.languages}</th>
               <th className="px-4 py-3 font-semibold">{t.admin.cols.status}</th>
-              <th className="px-4 py-3 font-semibold">🙏 / 💬</th>
+              <th className="px-4 py-3 font-semibold">
+                <span className="flex items-center gap-1.5">
+                  <LikeIcon className="size-4" aria-hidden /> / <CommentIcon className="size-4" aria-hidden />
+                </span>
+              </th>
               <th className="px-4 py-3 font-semibold">{t.admin.cols.updated}</th>
               <th className="px-4 py-3" />
             </tr>
@@ -61,8 +67,8 @@ export default async function AdminPage() {
               return (
                 <tr key={p.id} className="border-b border-line/60 last:border-0">
                   <td className="max-w-xs px-4 py-3">
-                    <p className="font-semibold line-clamp-1">
-                      {p.featured && "⭐ "}
+                    <p className="flex items-center gap-1.5 font-semibold line-clamp-1">
+                      {p.featured && <StarIcon className="size-4 shrink-0 text-gold" aria-hidden />}
                       {lang === "en" && p.titleEn ? p.titleEn : p.title}
                     </p>
                     <p className="text-xs text-muted line-clamp-1">/blog/{p.slug}</p>

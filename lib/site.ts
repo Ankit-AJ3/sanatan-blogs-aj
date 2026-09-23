@@ -40,7 +40,6 @@ export type Category = {
   name: string;
   nameHi: string;
   description: string;
-  icon: string;
   gradient: [string, string];
 };
 
@@ -50,7 +49,6 @@ export const categories: Category[] = [
     name: "Bhagavad Gita",
     nameHi: "भगवद् गीता",
     description: "श्रीकृष्ण के उपदेश — कर्म, भक्ति और ज्ञान का सार।",
-    icon: "🪷",
     gradient: ["#b45309", "#7c2d12"],
   },
   {
@@ -58,7 +56,6 @@ export const categories: Category[] = [
     name: "Vedas & Upanishads",
     nameHi: "वेद और उपनिषद",
     description: "मानवता के प्राचीनतम ग्रंथों का ज्ञान और दर्शन।",
-    icon: "📜",
     gradient: ["#a16207", "#713f12"],
   },
   {
@@ -66,7 +63,6 @@ export const categories: Category[] = [
     name: "Ramayana & Mahabharata",
     nameHi: "रामायण और महाभारत",
     description: "इतिहास-ग्रंथों की कथाएँ और उनसे मिलने वाली सीख।",
-    icon: "🏹",
     gradient: ["#9f1239", "#4c0519"],
   },
   {
@@ -74,7 +70,6 @@ export const categories: Category[] = [
     name: "Puranas & Kathas",
     nameHi: "पुराण और कथाएँ",
     description: "देवी-देवताओं, अवतारों और भक्तों की पावन कथाएँ।",
-    icon: "🐚",
     gradient: ["#c2410c", "#7c2d12"],
   },
   {
@@ -82,7 +77,6 @@ export const categories: Category[] = [
     name: "Festivals & Vrat",
     nameHi: "त्योहार और व्रत",
     description: "पर्व, व्रत, पूजा-विधि और उनका आध्यात्मिक महत्व।",
-    icon: "🪔",
     gradient: ["#ea580c", "#9a3412"],
   },
   {
@@ -90,7 +84,6 @@ export const categories: Category[] = [
     name: "Temples & Tirth",
     nameHi: "मंदिर और तीर्थ",
     description: "ज्योतिर्लिंग, शक्तिपीठ, चारधाम और पवित्र तीर्थ-स्थल।",
-    icon: "🛕",
     gradient: ["#b91c1c", "#7f1d1d"],
   },
   {
@@ -98,7 +91,6 @@ export const categories: Category[] = [
     name: "Yoga & Dhyan",
     nameHi: "योग और ध्यान",
     description: "योग, प्राणायाम, ध्यान और स्वस्थ जीवन-शैली।",
-    icon: "🧘",
     gradient: ["#0f766e", "#134e4a"],
   },
   {
@@ -106,7 +98,6 @@ export const categories: Category[] = [
     name: "Sanskriti & Parampara",
     nameHi: "संस्कृति और परंपरा",
     description: "संस्कार, रीति-रिवाज़ और भारतीय जीवन-मूल्य।",
-    icon: "🕉️",
     gradient: ["#92400e", "#451a03"],
   },
 ];

@@ -2,6 +2,24 @@
 
 import { useActionState, useRef, useState } from "react";
 import { savePost, type PostFormState } from "@/app/actions";
+import {
+  BoldIcon,
+  CheckIcon,
+  Heading2Icon,
+  Heading3Icon,
+  ImageUploadIcon,
+  ItalicIcon,
+  LinkIcon,
+  ListIcon,
+  OrderedListIcon,
+  PreviewIcon,
+  PublishIcon,
+  QuoteIcon,
+  SaveIcon,
+  SearchIcon,
+  WriteIcon,
+  type IconType,
+} from "@/components/icons";
 import { useLocale } from "@/components/LocaleProvider";
 import { Markdown } from "@/components/Markdown";
 import { ImageUpload, uploadToCloudinary } from "./ImageUpload";
@@ -13,16 +31,15 @@ import { slugify } from "@/lib/utils";
 const input =
   "w-full rounded-xl border border-line bg-bg px-4 py-2.5 outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/20";
 
-const toolbar: { label: string; title: string; before: string; after?: string; block?: boolean }[] = [
-  { label: "H2", title: "Heading", before: "## ", block: true },
-  { label: "H3", title: "Sub-heading", before: "### ", block: true },
-  { label: "B", title: "Bold", before: "**", after: "**" },
-  { label: "I", title: "Italic", before: "*", after: "*" },
-  { label: "❝", title: "Quote / Shloka", before: "> ", block: true },
-  { label: "•", title: "List", before: "- ", block: true },
-  { label: "1.", title: "Numbered list", before: "1. ", block: true },
-  { label: "🔗", title: "Link", before: "[", after: "](https://)" },
-  { label: "🖼", title: "Image", before: "![alt text](", after: ")" },
+const toolbar: { Icon: IconType; title: string; before: string; after?: string; block?: boolean }[] = [
+  { Icon: Heading2Icon, title: "Heading", before: "## ", block: true },
+  { Icon: Heading3Icon, title: "Sub-heading", before: "### ", block: true },
+  { Icon: BoldIcon, title: "Bold", before: "**", after: "**" },
+  { Icon: ItalicIcon, title: "Italic", before: "*", after: "*" },
+  { Icon: QuoteIcon, title: "Quote / Shloka", before: "> ", block: true },
+  { Icon: ListIcon, title: "List", before: "- ", block: true },
+  { Icon: OrderedListIcon, title: "Numbered list", before: "1. ", block: true },
+  { Icon: LinkIcon, title: "Link", before: "[", after: "](https://)" },
 ];
 
 type Fields = { title: string; excerpt: string; content: string };
@@ -84,7 +101,8 @@ export function PostEditor({ post }: { post?: Post }) {
   }
 
   // English slugs rank better, so prefer the English title when auto-generating
-  const effectiveSlug = slugTouched ? slug : slugify(fields.en.title || fields.hi.title);
+  const autoSlugSource = fields.en.title || fields.hi.title;
+  const effectiveSlug = slugTouched ? slug : autoSlugSource ? slugify(autoSlugSource) : "";
   const isEn = contentLang === "en";
   const errorText = state.error ? t.editor.errors[state.error] : null;
 
@@ -114,7 +132,7 @@ export function PostEditor({ post }: { post?: Post }) {
               }`}
             >
               {l === "hi" ? t.editor.hindiTab : t.editor.englishTab}
-              {fields[l].title && fields[l].content ? <span aria-hidden>✓</span> : null}
+              {fields[l].title && fields[l].content ? <CheckIcon className="size-4" aria-hidden /> : null}
             </button>
           ))}
         </div>
@@ -168,8 +186,11 @@ export function PostEditor({ post }: { post?: Post }) {
                   key={v}
                   type="button"
                   onClick={() => setTab(v)}
-                  className={`rounded-full px-4 py-1 font-semibold ${tab === v ? "bg-saffron text-white" : "text-muted"}`}
+                  className={`flex items-center gap-1.5 rounded-full px-4 py-1 font-semibold ${
+                    tab === v ? "bg-saffron text-white" : "text-muted"
+                  }`}
                 >
+                  {v === "write" ? <WriteIcon className="size-4" aria-hidden /> : <PreviewIcon className="size-4" aria-hidden />}
                   {v === "write" ? t.editor.write : t.editor.preview}
                 </button>
               ))}
@@ -182,10 +203,11 @@ export function PostEditor({ post }: { post?: Post }) {
                   key={tb.title}
                   type="button"
                   title={tb.title}
+                  aria-label={tb.title}
                   onClick={() => applyFormat(tb)}
-                  className="min-w-9 rounded-lg px-2 py-1 text-sm font-bold hover:bg-surface"
+                  className="grid size-8 place-items-center rounded-lg hover:bg-surface"
                 >
-                  {tb.label}
+                  <tb.Icon className="size-4" aria-hidden />
                 </button>
               ))}
               <span className="mx-1 w-px bg-line" aria-hidden />
@@ -193,8 +215,9 @@ export function PostEditor({ post }: { post?: Post }) {
                 type="button"
                 onClick={() => imageInput.current?.click()}
                 disabled={inserting}
-                className="rounded-lg px-2 py-1 text-sm font-bold hover:bg-surface disabled:opacity-60"
+                className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold hover:bg-surface disabled:opacity-60"
               >
+                <ImageUploadIcon className="size-4" aria-hidden />
                 {inserting ? t.editor.upload.uploading : t.editor.upload.insert}
               </button>
               <input
@@ -251,8 +274,9 @@ export function PostEditor({ post }: { post?: Post }) {
           )}
           <button
             disabled={pending}
-            className="w-full rounded-full bg-gradient-to-r from-saffron to-maroon py-3 font-semibold text-white shadow-md transition hover:brightness-110 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-saffron to-maroon py-3 font-semibold text-white shadow-md transition hover:brightness-110 disabled:opacity-60"
           >
+            {post ? <SaveIcon className="size-4" aria-hidden /> : <PublishIcon className="size-4" aria-hidden />}
             {pending ? t.editor.saving : post ? t.editor.update : t.editor.save}
           </button>
         </div>
@@ -268,7 +292,7 @@ export function PostEditor({ post }: { post?: Post }) {
               </option>
               {categories.map((c) => (
                 <option key={c.slug} value={c.slug}>
-                  {c.icon} {categoryText(c, lang).name}
+                  {categoryText(c, lang).name}
                 </option>
               ))}
             </select>
@@ -313,7 +337,10 @@ export function PostEditor({ post }: { post?: Post }) {
         </div>
 
         <div className="rounded-2xl border border-line bg-surface p-5 text-sm">
-          <p className="mb-2 font-semibold">{t.editor.googlePreview}</p>
+          <p className="mb-2 flex items-center gap-1.5 font-semibold">
+            <SearchIcon className="size-4" aria-hidden />
+            {t.editor.googlePreview}
+          </p>
           <p className="truncate text-xs text-green-700">
             sanatanblogs › {isEn ? "en › " : ""}blog › {effectiveSlug || "…"}
           </p>
