@@ -186,6 +186,12 @@ const hi = {
       generic: "कुछ गड़बड़ हुई। कृपया पुनः प्रयास करें।",
     },
   },
+  adminLogin: {
+    title: "Admin लॉगिन",
+    text: "यह पृष्ठ केवल साइट के लेखकों के लिए है।",
+    notAdmin: (email: string) =>
+      `${email} के पास Admin अधिकार नहीं हैं। कृपया Admin खाते से लॉगिन करें या इस ईमेल को ADMIN_EMAILS में जोड़ें।`,
+  },
   about: {
     metaTitle: "हमारे बारे में",
     title: "हमारे बारे में",
@@ -451,6 +457,12 @@ const en: Dictionary = {
       USER_NOT_FOUND: "No account found for this email.",
       generic: "Something went wrong. Please try again.",
     },
+  },
+  adminLogin: {
+    title: "Admin login",
+    text: "This page is for the site's authors only.",
+    notAdmin: (email: string) =>
+      `${email} doesn't have admin access. Sign in with an admin account, or add this email to ADMIN_EMAILS.`,
   },
   about: {
     metaTitle: "About Us",

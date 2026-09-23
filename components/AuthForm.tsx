@@ -15,7 +15,7 @@ const RESEND_SECONDS = 45;
 const field =
   "w-full rounded-xl border border-line bg-bg px-4 py-2.5 outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/20";
 
-export function AuthForm({ callbackURL }: { callbackURL: string }) {
+export function AuthForm({ callbackURL, allowSignUp = true }: { callbackURL: string; allowSignUp?: boolean }) {
   const { t } = useLocale();
   const a = t.auth;
   const router = useRouter();
@@ -166,7 +166,7 @@ export function AuthForm({ callbackURL }: { callbackURL: string }) {
         </>
       )}
 
-      {mode !== "forgot" && !isOtpStep && (
+      {allowSignUp && mode !== "forgot" && !isOtpStep && (
         <div role="tablist" aria-label={a.tabSignIn} className="mb-5 flex rounded-full border border-line bg-surface p-1">
           {(["signin", "signup"] as const).map((m) => (
             <button

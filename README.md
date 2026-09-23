@@ -39,7 +39,19 @@ npm run dev
 
 ### Admin access
 
-Put your Google email(s) in `ADMIN_EMAILS` (comma-separated). After you log in with that account, the user menu shows **Admin Dashboard** and **नया लेख लिखें**.
+Readers sign in at `/login`. **Admins sign in at a separate, secret URL** so the panel isn't discoverable:
+
+| URL | Who |
+|---|---|
+| `/login` | readers (Google, or email + password with OTP) |
+| `/<ADMIN_LOGIN_PATH>` | admin login, e.g. `/sb-control-9f2a7c41` |
+| `/admin` | the dashboard — **404 for everyone without an admin session** |
+
+Set `ADMIN_LOGIN_PATH` in the environment to your own random string. It is used only by `proxy.ts`
+on the server, so it never reaches the browser bundle, and it appears in neither the sitemap nor robots.txt.
+Change the value any time to rotate the link.
+
+Put your email(s) in `ADMIN_EMAILS` (comma-separated) — those accounts, and only those, can open the dashboard. Once signed in, the user menu also shows **Admin Dashboard** and **नया लेख लिखें**.
 
 ### MongoDB
 
