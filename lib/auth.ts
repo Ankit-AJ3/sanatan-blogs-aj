@@ -68,6 +68,9 @@ export function isAdminEmail(email?: string | null) {
   return !!email && adminEmails().includes(email.toLowerCase());
 }
 
+/** Google sign-in only works once both credentials are set. */
+export const googleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
 export async function getAdmin() {
   const session = await getSession();
   return session && isAdminEmail(session.user.email) ? session : null;

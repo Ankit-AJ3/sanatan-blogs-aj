@@ -1,4 +1,5 @@
 import { localePath } from "@/lib/i18n";
+import { googleConfigured } from "@/lib/auth";
 import { getT } from "@/lib/locale";
 import { timeAgo } from "@/lib/utils";
 import { Avatar } from "./Avatar";
@@ -46,7 +47,7 @@ export async function Comments({
         ) : (
           <div className="py-4 text-center">
             <p className="mb-4 text-muted">{t.comments.loginPrompt}</p>
-            <SignInButton callbackURL={`${localePath(lang, `/blog/${slug}`)}#comments`} />
+            {googleConfigured && <SignInButton callbackURL={`${localePath(lang, `/blog/${slug}`)}#comments`} />}
             <Link
               href={`${localePath(lang, "/login")}?next=${encodeURIComponent(`${localePath(lang, `/blog/${slug}`)}#comments`)}`}
               className="mt-3 inline-block text-sm font-semibold text-saffron hover:underline"

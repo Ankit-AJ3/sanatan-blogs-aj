@@ -15,7 +15,16 @@ const RESEND_SECONDS = 45;
 const field =
   "w-full rounded-xl border border-line bg-bg px-4 py-2.5 outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/20";
 
-export function AuthForm({ callbackURL, allowSignUp = true }: { callbackURL: string; allowSignUp?: boolean }) {
+export function AuthForm({
+  callbackURL,
+  allowSignUp = true,
+  googleEnabled = true,
+}: {
+  callbackURL: string;
+  allowSignUp?: boolean;
+  /** False when GOOGLE_CLIENT_ID/SECRET aren't configured, so the button isn't a dead end */
+  googleEnabled?: boolean;
+}) {
   const { t } = useLocale();
   const a = t.auth;
   const router = useRouter();
@@ -143,7 +152,7 @@ export function AuthForm({ callbackURL, allowSignUp = true }: { callbackURL: str
   return (
     <div>
       {/* Google is the quickest path, so it stays on top */}
-      {!isOtpStep && (
+      {googleEnabled && !isOtpStep && (
         <>
           <button
             type="button"

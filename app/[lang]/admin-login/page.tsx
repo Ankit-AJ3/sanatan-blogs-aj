@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { LockIcon } from "@/components/icons";
-import { getAdmin, getSession } from "@/lib/auth";
+import { getAdmin, getSession, googleConfigured } from "@/lib/auth";
 import { localePath } from "@/lib/i18n";
 import { getT } from "@/lib/locale";
 
@@ -35,7 +35,7 @@ export default async function AdminLoginPage() {
           </p>
         ) : (
           <div className="mt-6">
-            <AuthForm callbackURL={dashboard} allowSignUp={false} />
+            <AuthForm callbackURL={dashboard} allowSignUp={false} googleEnabled={googleConfigured} />
           </div>
         )}
       </div>

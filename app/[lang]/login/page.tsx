@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { CheckIcon } from "@/components/icons";
-import { getSession } from "@/lib/auth";
+import { getSession, googleConfigured } from "@/lib/auth";
 import { getDictionary, isLocale, localePath } from "@/lib/i18n";
 import { getT } from "@/lib/locale";
 
@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/[lang]/log
         <p className="mt-2 text-muted">{t.login.text}</p>
 
         <div className="mt-6">
-          <AuthForm callbackURL={next} />
+          <AuthForm callbackURL={next} googleEnabled={googleConfigured} />
         </div>
 
         <ul className="mt-8 space-y-2 text-left text-sm text-muted">
